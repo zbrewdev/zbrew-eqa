@@ -1,0 +1,10 @@
+#!/bin/sh
+#set -x
+
+out=$(whence zbrewfuncs >/dev/null)
+if [ $? -eq 0 ]; then
+        . zbrewfuncs
+else
+        echo "zbrew tools need to be in your PATH"
+        exit 4
+fi
