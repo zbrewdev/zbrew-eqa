@@ -10,60 +10,148 @@ else
 fi
 
 mydir=$(callerdir "${0}")
-props="${mydir}/../../zbrew/global.properties"
+props="${mydir}/../../zbrew/properties/global.properties"
 . zbrewprops ${props}
 
 
-check_CICS(){
-
-fmid_check='y'
-ptfs='HCI6900'
-chk_prod='CICS Base FMID'
-ptf_Check
-rc=$?
-if [ "${rc}" -eq "17" ]; then
-	echo "No PTFs to be checked. FMID not installed in CSI"
-else
-	ptfs='UW34392 UI61518'
-	chk_prod="CICS TS Version 5.2"
-	fmid_check='n'
-	ptf_Check
-fi
-
-
+check_HLASM() {
+	chk_prod="HLASM"
+	echo "Checking HLASM reqs"
+	CHK_CSI=${HLASM_CSI}
+	fmid_check='y'
+	sysmods='HMQ4160'
+	sysmod_Check
+	rc=$?
+	if [ "${rc}" -eq "16" ]; then
+		echo "No PTFs to be checked. FMID not installed in CSI"
+	fi
+	if [ "${rc}" -eq "0" ]; then
+		fmid_check='n'
+		sysmods='UK47103 UK59311'
+		sysmod_Check
+	fi
 
 }
+
+
+check_COBOL(){
+	chk_prod="COBOL-${cobver}"
+	echo "Checking Cobol-${cobver} reqs"
+	eval CHK_CSI=$"COBOL${cobver}_CSI"
+	fmid_check='y'
+	case ${cobver} in
+		51 )
+			fmid='HADB510'
+			ptfs='UI62769 UI63486 UI63637'
+			;;
+		52 )
+			fmid='HADB520'
+			ptfs='UI42823 UI47619 UI62754 UI63478 UI63640'
+			;;
+		61 )
+			fmid='HADB610'
+			ptfs='UI43370 UI48286 UI57900'
+			;;
+		62 )
+			fmid='HADB620'
+			ptfs='UI57342'
+			;;
+	esac
+	sysmods=${fmid}
+	sysmod_Check
+	rc=$?
+	if [ "${rc}" -eq "16" ]; then
+		echo "No PTFs to be checked. Base FMID ${sysmods} is NOT installed in CSI ${CHK_CSI}"
+	fi
+	if [ "${rc}" -eq 0 ]; then
+		fmid_check='n'
+		sysmods=${ptfs}
+		sysmod_Check
+	fi
+}
+
+
+
+check_CICS(){
+	chk_prod="CICS-5.2"
+	echo "Checking CICS reqs"
+	CHK_CSI=${CICS52_CSI}
+	fmid_check='y'
+	sysmods='HCI6900'
+	sysmod_Check
+	rc=$?
+	if [ "${rc}" -eq "16" ]; then
+		echo "No PTFs to be checked. FMID ${sysmods} is not installed in CSI ${CHK_CSI}"
+	fi
+	if [ "${rc}" -eq "0" ]; then
+		fmid_check='n'
+		sysmods='UI22206 UI30410'
+		sysmod_Check
+	fi
+
+}
+
+
 
 check_LE(){
-case ${release} in
-	'02.00' ) ptfs='UI99999 UI30573 UI31702 UI33265 UI43053 UI45429 UI43458 UI49699 UI53511 UI53889 UI54726 UI56507 UI61245 UI29282';;
-	'03.00' ) ptfs='UI50167 UI53807 UI53820 UI56511 UI61244';;
-	'04.00' ) ptfs='';;
-	* ) echo "z/OS 2.${release} not supported for EQAE20";;
-esac
-chk_prod="Language Environment"
-ptf_Check 
+	chk_prod="LE"
+	echo "Checking LE reqs"
+	CHK_CSI=${CEE_CSI}
+	case ${release} in
+		'02.00' ) sysmods='UI30573 UI31702 UI33265 UI43053 UI45429 UI43458 UI49699 UI53511 UI53889 UI54726 UI56507 UI61245 UI29282';;
+		'03.00' ) sysmods='UI50167 UI53807 UI53820 UI56511 UI61244 UI99999';;
+		'04.00' ) sysmods='';;
+		* ) echo "z/OS 2.${release} not supported for EQAE20";;
+	esac
+	sysmod_Check 
+	
 }
 
 
-ptf_Check(){
-if [ "${ptfs}" = '' ]; then
-	exit 0
-fi
 
-if [ "${CHK_CSI}" = "NONE" ]; then
-	echo "No SMP/E CSI specified for ${chk_prod}. Pre-requisites are assumed ok"
-	exit 0
-fi
-out=`smpchkptf ${CHK_CSI} ${fmid_check} ${ptfs}`
-rc=$?
-if [ $rc -gt 0 ]; then
-	echo ${out}
-else
-	echo ${chk_prod}" SMPE check "${out}
-fi
-return ${rc}
+sysmod_Check(){
+	if [ "${sysmods}" = '' ]; then
+		return 0
+	fi
+
+	if [ "${CHK_CSI}" = "NONE" ]; then
+		echo "No SMP/E CSI specified for ${chk_prod}. Pre-requisites are assumed ok"
+		return 12
+	fi
+	if [ "${fmid_check}" = 'y' ]; then
+		opts="${opts} -f"
+	fi
+	out=`smpchkptf ${opts} ${CHK_CSI} ${sysmods}`
+	rc=$?
+	if [ $rc -gt 0 ]; then
+		echo ${out}
+	fi
+	return ${rc}
 }
+
+debug=0
+verbose=0
+fmid_check=0
+opts=""
+while getopts ":vd" opt; do
+  case ${opt} in
+    d )
+      debug=1
+      opts="${opts} -d"
+      ;;
+    v )
+      verbose=1
+      opts="${opts} -v"
+      ;;
+    \?)
+      if [ ${OPTARG} != "?" ]; then
+	msg zbrew ${InvalidOption} E "${OPTARG}"
+      fi
+      syntax
+      exit 4
+      ;;
+  esac
+done
 
 
 zosinfo=`uname -rsvI`
@@ -74,17 +162,14 @@ if [ "${version}" != "02" ]; then
 fi
 release=`echo ${zosinfo} | awk '{ print $2; }'`
 
-CHK_CSI=${CEE_CSI}
-fmid_check='n'
 check_LE 
 
-CHK_CSI=${CICS_CSI}
 check_CICS
 
-# CHK_CSI=$(HLASM_CSI}
-# check_HLASM
+check_HLASM
 
-# CHK_CSI=${COBOL_CSI}
-# check_COBOL
+for cobver in 51 52 61 62; do
+	check_COBOL
+done
 
 exit $rc
