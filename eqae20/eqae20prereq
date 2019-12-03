@@ -119,9 +119,10 @@ sysmod_Check(){
 		return 12
 	fi
 	if [ "${fmid_check}" = 'y' ]; then
-		opts="${opts} -f"
+		out=`smpchkptf ${opts} -f ${CHK_CSI} ${sysmods}`
+	else
+		out=`smpchkptf ${opts} ${CHK_CSI} ${sysmods}`
 	fi
-	out=`smpchkptf ${opts} ${CHK_CSI} ${sysmods}`
 	rc=$?
 	if [ $rc -gt 0 ]; then
 		echo ${out}
