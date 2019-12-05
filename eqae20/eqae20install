@@ -57,9 +57,9 @@ zzz
 	exit 0
 }
 
-
+#for All but ZFS libraries
 targ_dddefs(){
-targdddefs=`awk -F',' '($7 == "T") {print $1}' < ${smpelibs}` 
+targdddefs=`awk -F',' '($7 == "T" && $2 != "ZFS") {print $1}' < ${smpelibs}` 
 for targdddef in ${targdddefs}; do
  smpuclin="${smpuclin}
  ADD DDDEF(${targdddef})
@@ -70,7 +70,18 @@ for targdddef in ${targdddefs}; do
 "
 done
 
-for targdddef in ${CEEHLQ}.SCEELKED ${CSSHLQ}.CSSLIB ${TCPHLQ}.SEZATCP; do
+#for ZFS
+targdddefs=`awk -F',' '($7 == "T" && $2 == "ZFS") {print $1}' < ${smpelibs}`
+for targdddef in ${targdddefs}; do
+ smpuclin="${smpuclin}
+ ADD DDDEF(${targdddef})
+ PATH('${eqaroot}usr/lpp/IBM/debug/').
+"
+done
+
+
+#for CALLLIBS 
+for targdddef in ${CEEHLQ}.SCEELKED ${CSSHLQ}.CSSLIB ${TCPHLQ}.SEZATCP ${ISPHLQ}.SISPLOAD; do
  llq=`echo ${targdddef} | awk -F'.' '{print $2}'`
  smpuclin="${smpuclin}
   ADD DDDEF(${llq})
