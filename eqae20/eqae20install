@@ -69,6 +69,17 @@ for targdddef in ${targdddefs}; do
  SHR.
 "
 done
+
+for targdddef in ${CEEHLQ}.SCEELKED ${CSSHLQ}.CSSLIB ${TCPHLQ}.SEZATCP; do
+ llq=`echo ${targdddef} | awk -F'.' '{print $2}'`
+ smpuclin="${smpuclin}
+  ADD DDDEF(${llq})
+  DA(${targdddef})
+  UNIT(SYSALLDA)
+  WAITFORDSN
+  SHR.
+"
+done
 }
 
 dist_dddefs(){
