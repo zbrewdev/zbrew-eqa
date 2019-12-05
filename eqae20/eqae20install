@@ -1,0 +1,171 @@
+#!/bin/sh
+#set -x
+
+out=$(whence zbrewfuncs >/dev/null)
+if [ $? -eq 0 ]; then
+	. zbrewfuncs
+else
+	echo "zbrew tools need to be in your PATH"
+	exit 4
+fi
+
+crtds() {
+	echo $1
+	echo "$1" | awk '{ ds=$1; $1=""; attrs=$0; if ($ds != "") { rc=system("dtouch " attrs " " ds); if (rc > 0) { exit(rc); } } }'
+	exit $?
+}
+
+crtzfs() {
+	root="${eqaroot}"
+	arg=0
+	for zfsarg in ${1}; do
+		arg=`expr ${arg} + 1`
+		eval "zfsarg${arg}"="${zfsarg}"
+	done
+	zfsname="${zfsarg1}"
+	primary="${zfsarg2}"
+	secondary="${zfsarg3}"
+	middle='/usr/lpp/IBM/debug/'
+	mkdir -p -m 755 ${root}${middle}
+	rc=$?
+	if [ $rc -gt 0 ]; then
+		echo "Error creating debug directory RC: $rc"
+		exit $rc
+	fi
+
+	mvscmdauth --pgm=IDCAMS --sysprint='*' --sysin=stdin <<zzz
+   DEFINE CLUSTER(NAME(${zfsname}) -
+   LINEAR TRACKS(${primary} ${secondary}) SHAREOPTIONS(3))
+zzz
+	rc=$?
+	if [ $rc -gt 0 ]; then
+		echo "Error creating ZFS Linear Cluster:  $rc"
+		exit $rc
+	fi
+	mvscmdauth --pgm=IOEAGFMT --args="-aggregate ${zfsname} -compat" --sysprint='*'
+	rc=$?
+	if [ $rc -gt 0 ]; then
+		echo "Error formatting ZFS: $rc"
+		exit $rc
+	fi
+	/usr/sbin/mount -t zfs -f ${zfsname} ${root}${middle}
+	rc=$?
+	if [ $rc -gt 0 ]; then
+		echo "Error mounting ZFS:  $rc"
+		exit $rc
+	fi
+	exit 0
+}
+
+
+targ_dddefs(){
+targdddefs=`awk -F',' '($7 == "T") {print $1}' < ${smpelibs}` 
+for targdddef in ${targdddefs}; do
+ smpuclin="${smpuclin}
+ ADD DDDEF(${targdddef})
+ DA(${ZBREW_HLQ}EQAE20.${targdddef})
+ UNIT(SYSALLDA)
+ WAITFORDSN
+ SHR.
+"
+done
+
+for targdddef in ${CEEHLQ}.SCEELKED ${CSSHLQ}.CSSLIB ${TCPHLQ}.SEZATCP; do
+ llq=`echo ${targdddef} | awk -F'.' '{print $2}'`
+ smpuclin="${smpuclin}
+  ADD DDDEF(${llq})
+  DA(${targdddef})
+  UNIT(SYSALLDA)
+  WAITFORDSN
+  SHR.
+"
+done
+}
+
+dist_dddefs(){
+distdddefs=`awk -F',' '($7 == "D") {print $1}' < ${smpelibs}`
+for distdddef in ${distdddefs};do
+ smpuclin="${smpuclin}
+ ADD DDDEF(${distdddef})
+ DA(${ZBREW_HLQ}EQAE20.${distdddef})
+ UNIT(SYSALLDA)
+ WAITFORDSN
+ SHR.
+"
+
+done
+}
+
+
+run_gimsmp(){
+#mvscmdauth --pgm=GIMSMP --smpcsi=${ZBREW_HLQ}EQAE20G.GLOBAL.CSI --smppts=${ZBREW_HLQ}EQAE20G.SMPPTS --smplog='*' --smpout='*' --smprpt='*' --smplist='*' --sysprint='*'  --smpcntl=stdin <<zzz
+mvscmdauth --pgm=GIMSMP --smpcsi=${ZBREW_HLQ}EQAE20G.GLOBAL.CSI --smppts=${ZBREW_HLQ}EQAE20G.SMPPTS --sysprint='*' --smpcntl=stdin <<zzz
+${smpuclin}
+zzz
+        rc=$?
+        if [ $rc -gt 0 ]; then
+                exit $rc
+        fi
+
+}
+
+
+
+
+mydir=$(callerdir ${0})
+props="${mydir}/../../zbrew/properties/zbrew.properties"
+. zbrewprops "${props}"
+if [ $? -gt 0 ]; then
+        echo "Internal Error. Unable to find ${props}" >&2
+        exit 4
+fi     
+
+props="${mydir}/eqae20install.properties"
+. zbrewprops ${props}
+
+
+smpelibs="${mydir}/eqae20smpelibs"
+
+# Obtain list of all Target and Distribution Datasets to allocate, exclude ZFS
+ds=`awk -v pfx="${ZBREW_HLQ}EQAE20." -F',' '($2 != "ZFS") {print pfx""$1" -t"$2" -r"$3" -l"$4" -s"$5*56"K"}' < ${smpelibs}`
+
+out=`crtds "${ds}"`
+rc=$?
+if [ $rc -gt 0 ]; then
+	echo "Dataset creation failed. Installation aborted"
+	exit $rc
+fi
+
+# Obtain list of ZFS and allocate/mount
+ds=`awk -v pfx="${ZBREW_HLQ}EQAE20." -F',' '($2 == "ZFS") {print pfx""$1" "$3" "$4}' < ${smpelibs}`
+zfsout=`crtzfs "${ds}"`
+
+if [ $rc -gt 0 ]; then
+        echo "ZFS creation/mount failed. Installation aborted"
+        exit $rc
+fi
+
+# Update Target Zone DDDEFS, note Target Zone contains both Targ/Dist libraries
+smpuclin="  SET   BDY(EQAE20T).
+     UCLIN.
+"
+targ_dddefs
+dist_dddefs
+ 
+smpuclin="${smpuclin} 
+     ENDUCL."
+run_gimsmp
+
+
+
+# Update Distribution Zone DDDEFS
+smpuclin="  SET BDY(EQAE20D).
+     UCLIN.
+"
+dist_dddefs
+smpuclin="${smpuclin}
+     ENDUCL."
+run_gimsmp
+
+
+exit 0
