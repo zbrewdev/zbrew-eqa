@@ -116,7 +116,7 @@ sysmod_Check(){
 
 	if [ "${CHK_CSI}" = "NONE" ]; then
 		echo "No SMP/E CSI specified for ${chk_prod}. Pre-requisites are assumed ok"
-		return 12
+		return 0
 	fi
 	if [ "${fmid_check}" = 'y' ]; then
 		out=`smpchkptf ${opts} -f ${CHK_CSI} ${sysmods}`
@@ -126,6 +126,8 @@ sysmod_Check(){
 	rc=$?
 	if [ $rc -gt 0 ]; then
 		echo ${out}
+		echo "Missing Pre-requisites .. terminating : ${rc}"
+		exit ${rc}
 	fi
 	return ${rc}
 }
