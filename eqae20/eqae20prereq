@@ -99,7 +99,7 @@ check_LE(){
 	CHK_CSI=${CEE_CSI}
 	case ${release} in
 		'02.00' ) sysmods='UI30573 UI31702 UI33265 UI43053 UI45429 UI43458 UI49699 UI53511 UI53889 UI54726 UI56507 UI61245 UI29282';;
-		'03.00' ) sysmods='UI50167 UI53807 UI53820 UI56511 UI61244 UI99999';;
+		'03.00' ) sysmods='UI50167 UI53807 UI53820 UI56511 UI61244';;
 		'04.00' ) sysmods='';;
 		* ) echo "z/OS 2.${release} not supported for EQAE20";;
 	esac
