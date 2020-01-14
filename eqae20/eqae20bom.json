@@ -9,7 +9,7 @@
 				"lrecl":"0",
 				"primary":"1630",
 				"secondary":"0",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQASAMP",
@@ -18,7 +18,7 @@
 				"lrecl":"80",
 				"primary":"100",
 				"secondary":"25",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQAEXEC",
@@ -27,7 +27,7 @@
 				"lrecl":"80",
 				"primary":"160",
 				"secondary":"15",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQAMENU",
@@ -36,7 +36,7 @@
 				"lrecl":"80",
 				"primary":"2",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQAPENU",
@@ -45,7 +45,7 @@
 				"lrecl":"80",
 				"primary":"112",
 				"secondary":"55",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQASENU",
@@ -54,7 +54,7 @@
 				"lrecl":"80",
 				"primary":"9",
 				"secondary":"5",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQATLIB",
@@ -63,7 +63,7 @@
 				"lrecl":"80",
 				"primary":"5",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQAMENP",
@@ -72,7 +72,7 @@
 				"lrecl":"80",
 				"primary":"2",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQAPENP",
@@ -81,7 +81,7 @@
 				"lrecl":"80",
 				"primary":"112",
 				"secondary":"55",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQASENP",
@@ -90,7 +90,7 @@
 				"lrecl":"80",
 				"primary":"9",
 				"secondary":"5",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQAZFS",
@@ -99,7 +99,7 @@
 				"lrecl":"6995",
 				"primary":"720",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQAMJPN",
@@ -108,7 +108,7 @@
 				"lrecl":"80",
 				"primary":"2",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQAPJPN",
@@ -117,7 +117,7 @@
 				"lrecl":"80",
 				"primary":"112",
 				"secondary":"70",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQASJPN",
@@ -126,7 +126,7 @@
 				"lrecl":"80",
 				"primary":"9",
 				"secondary":"3",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQAMKOR",
@@ -135,7 +135,7 @@
 				"lrecl":"80",
 				"primary":"2",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQAPKOR",
@@ -144,7 +144,7 @@
 				"lrecl":"80",
 				"primary":"112",
 				"secondary":"70",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AEQASKOR",
@@ -153,7 +153,7 @@
 				"lrecl":"80",
 				"primary":"9",
 				"secondary":"3",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"SEQALPA",
@@ -162,7 +162,7 @@
 				"lrecl":"0",
 				"primary":"3",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQAAUTH",
@@ -171,7 +171,7 @@
 				"lrecl":"0",
 				"primary":"14",
 				"secondary":"0",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQAMOD",
@@ -180,7 +180,7 @@
 				"lrecl":"0",
 				"primary":"1640",
 				"secondary":"0",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQABMOD",
@@ -189,7 +189,7 @@
 				"lrecl":"0",
 				"primary":"92",
 				"secondary":"0",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQASAMP",
@@ -198,7 +198,7 @@
 				"lrecl":"80",
 				"primary":"105",
 				"secondary":"25",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQAEXEC",
@@ -207,7 +207,7 @@
 				"lrecl":"80",
 				"primary":"160",
 				"secondary":"15",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQAMENU",
@@ -216,7 +216,7 @@
 				"lrecl":"80",
 				"primary":"2",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQAPENU",
@@ -225,7 +225,7 @@
 				"lrecl":"80",
 				"primary":"112",
 				"secondary":"55",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQASENU",
@@ -234,7 +234,7 @@
 				"lrecl":"80",
 				"primary":"9",
 				"secondary":"5",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQATLIB",
@@ -243,7 +243,7 @@
 				"lrecl":"80",
 				"primary":"5",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQAMENP",
@@ -252,7 +252,7 @@
 				"lrecl":"80",
 				"primary":"2",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQAPENP",
@@ -261,7 +261,7 @@
 				"lrecl":"80",
 				"primary":"112",
 				"secondary":"55",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQASENP",
@@ -270,7 +270,7 @@
 				"lrecl":"80",
 				"primary":"9",
 				"secondary":"5",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQAMJPN",
@@ -279,7 +279,7 @@
 				"lrecl":"80",
 				"primary":"2",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQAPJPN",
@@ -288,7 +288,7 @@
 				"lrecl":"80",
 				"primary":"112",
 				"secondary":"70",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQASJPN",
@@ -297,7 +297,7 @@
 				"lrecl":"80",
 				"primary":"9",
 				"secondary":"3",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQAMKOR",
@@ -306,7 +306,7 @@
 				"lrecl":"80",
 				"primary":"2",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQAPKOR",
@@ -315,7 +315,7 @@
 				"lrecl":"80",
 				"primary":"112",
 				"secondary":"70",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQASKOR",
@@ -324,7 +324,7 @@
 				"lrecl":"80",
 				"primary":"9",
 				"secondary":"3",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SEQAZFS",
@@ -333,7 +333,7 @@
 				"lrecl":"150",
 				"primary":"",
 				"secondary":"",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SABJMODJ",
@@ -342,7 +342,7 @@
 				"lrecl":"0",
 				"primary":"80",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SABJSAMJ",
@@ -351,7 +351,7 @@
 				"lrecl":"80",
 				"primary":"10",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SABJSAM3",
@@ -360,7 +360,7 @@
 				"lrecl":"1028",
 				"primary":"50",
 				"secondary":"5",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SABJMLIJ",
@@ -369,7 +369,7 @@
 				"lrecl":"80",
 				"primary":"4",
 				"secondary":"1",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SABJPLIJ",
@@ -378,7 +378,7 @@
 				"lrecl":"80",
 				"primary":"20",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SABJTLIJ",
@@ -387,7 +387,7 @@
 				"lrecl":"80",
 				"primary":"2",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"AABJMODJ",
@@ -396,7 +396,7 @@
 				"lrecl":"0",
 				"primary":"80",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AABJSAMJ",
@@ -405,7 +405,7 @@
 				"lrecl":"80",
 				"primary":"10",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AABJSAM3",
@@ -414,7 +414,7 @@
 				"lrecl":"1028",
 				"primary":"50",
 				"secondary":"5",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AABJMLIJ",
@@ -423,7 +423,7 @@
 				"lrecl":"80",
 				"primary":"4",
 				"secondary":"1",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AABJPLIJ",
@@ -432,7 +432,7 @@
 				"lrecl":"80",
 				"primary":"20",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AABJTLIJ",
@@ -441,7 +441,7 @@
 				"lrecl":"80",
 				"primary":"2",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"SIPVLPA1",
@@ -450,7 +450,7 @@
 				"lrecl":"0",
 				"primary":"50",
 				"secondary":"5",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SIPVMENU",
@@ -459,7 +459,7 @@
 				"lrecl":"80",
 				"primary":"20",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SIPVMODA",
@@ -468,7 +468,7 @@
 				"lrecl":"0",
 				"primary":"600",
 				"secondary":"20",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SIPVMOD1",
@@ -477,7 +477,7 @@
 				"lrecl":"0",
 				"primary":"50",
 				"secondary":"5",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SIPVPENU",
@@ -486,7 +486,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SIPVSAM1",
@@ -495,7 +495,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SIPVTENU",
@@ -504,7 +504,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"AIPVLPA1",
@@ -513,7 +513,7 @@
 				"lrecl":"0",
 				"primary":"50",
 				"secondary":"5",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AIPVMENU",
@@ -522,7 +522,7 @@
 				"lrecl":"80",
 				"primary":"20",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AIPVMODA",
@@ -531,7 +531,7 @@
 				"lrecl":"0",
 				"primary":"600",
 				"secondary":"20",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AIPVMOD1",
@@ -540,7 +540,7 @@
 				"lrecl":"0",
 				"primary":"50",
 				"secondary":"5",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AIPVPENU",
@@ -549,7 +549,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AIPVSAM1",
@@ -558,7 +558,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AIPVTENU",
@@ -567,7 +567,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"SIPVMJPN",
@@ -576,7 +576,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SIPVPJPN",
@@ -585,7 +585,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SIPVTJPN",
@@ -594,7 +594,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"AIPVMJPN",
@@ -603,7 +603,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AIPVPJPN",
@@ -612,7 +612,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AIPVTJPN",
@@ -621,7 +621,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"SIPVMKOR",
@@ -630,7 +630,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SIPVPKOR",
@@ -639,7 +639,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SIPVTKOR",
@@ -648,7 +648,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"AIPVMKOR",
@@ -657,7 +657,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AIPVPKOR",
@@ -666,7 +666,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AIPVTKOR",
@@ -675,7 +675,7 @@
 				"lrecl":"80",
 				"primary":"15",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"SABJMOD1",
@@ -684,7 +684,7 @@
 				"lrecl":"0",
 				"primary":"70",
 				"secondary":"1",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SABJCLST",
@@ -693,7 +693,7 @@
 				"lrecl":"80",
 				"primary":"10",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SABJSAM1",
@@ -702,7 +702,7 @@
 				"lrecl":"80",
 				"primary":"9",
 				"secondary":"1",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SABJSAM2",
@@ -711,7 +711,7 @@
 				"lrecl":"1028",
 				"primary":"45",
 				"secondary":"5",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SABJMLIB",
@@ -720,7 +720,7 @@
 				"lrecl":"80",
 				"primary":"2",
 				"secondary":"1",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SABJPLIB",
@@ -729,7 +729,7 @@
 				"lrecl":"80",
 				"primary":"17",
 				"secondary":"5",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SABJLCP",
@@ -738,7 +738,7 @@
 				"lrecl":"80",
 				"primary":"110",
 				"secondary":"2",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SABJSLIB",
@@ -747,7 +747,7 @@
 				"lrecl":"80",
 				"primary":"4",
 				"secondary":"1",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SABJRSWD",
@@ -756,7 +756,7 @@
 				"lrecl":"80",
 				"primary":"10",
 				"secondary":"10",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"SABJTLIB",
@@ -765,7 +765,7 @@
 				"lrecl":"80",
 				"primary":"1",
 				"secondary":"1",
-				"zones":"["T"]
+				"zones":["T"]
 			},
 			{
 				"dsname":"AABJMOD1",
@@ -774,7 +774,7 @@
 				"lrecl":"0",
 				"primary":"70",
 				"secondary":"1",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AABJCLST",
@@ -783,7 +783,7 @@
 				"lrecl":"80",
 				"primary":"10",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AABJSAM1",
@@ -792,7 +792,7 @@
 				"lrecl":"80",
 				"primary":"9",
 				"secondary":"1",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AABJSAM2",
@@ -801,7 +801,7 @@
 				"lrecl":"1028",
 				"primary":"45",
 				"secondary":"5",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AABJMLIB",
@@ -810,7 +810,7 @@
 				"lrecl":"80",
 				"primary":"2",
 				"secondary":"1",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AABJPLIB",
@@ -819,7 +819,7 @@
 				"lrecl":"80",
 				"primary":"17",
 				"secondary":"5",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AABJLCP",
@@ -828,7 +828,7 @@
 				"lrecl":"80",
 				"primary":"110",
 				"secondary":"2",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AABJSLIB",
@@ -837,7 +837,7 @@
 				"lrecl":"80",
 				"primary":"4",
 				"secondary":"1",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AABJRSWD",
@@ -846,7 +846,7 @@
 				"lrecl":"80",
 				"primary":"10",
 				"secondary":"10",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"AABJTLIB",
@@ -855,14 +855,14 @@
 				"lrecl":"80",
 				"primary":"1",
 				"secondary":"1",
-				"zones":"["D"]
+				"zones":["D"]
 			},
 			{
 				"dsname":"SEQAZFS",
 				"dstype":"ZFS",
 				"primary":"1200",
 				"secondary":"150",
-				"zones":"["T"]
+				"zones":["T"]
 			}
 		]
 	}]
