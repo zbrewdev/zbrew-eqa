@@ -10,9 +10,8 @@ else
 fi
 
 mydir=$(callerdir "${0}")
-props="${mydir}/../../zbrew/properties/global.properties"
-. zbrewprops ${props}
-
+props="${mydir}/../../zbrew/properties/globalprops.json"
+zbrewpropse zbrew global ${props}
 
 check_HLASM() {
 	chk_prod="HLASM"
