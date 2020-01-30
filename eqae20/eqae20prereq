@@ -26,7 +26,7 @@ check_HMQ() {
 	fi
 	if [ "${rc}" -eq "0" ]; then
 		fmid_check='n'
-		sysmods='UK47103 UK59311 IK99999'
+		sysmods='UK47103 UK59311'
 		sysmod_Check
 	fi
 
