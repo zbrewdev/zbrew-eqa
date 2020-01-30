@@ -15,7 +15,6 @@ zbrewpropse zbrew global ${props}
 
 check_HMQ() {
 	chk_prod="HMQ"
-	echo "Checking HMQ reqs">&2
 	CHK_CSI=${HMQ_CSI}
 	fmid_check='y'
 	sysmods='HMQ4160'
@@ -35,7 +34,6 @@ check_HMQ() {
 
 check_IGY(){
 	chk_prod="IGY-${igyver}"
-	echo "Checking IGY-${igyver} reqs" >&2
 	eval CHK_CSI=$"IGY${igyver}_CSI"
 	fmid_check='y'
 	case ${igyver} in
@@ -73,7 +71,6 @@ check_IGY(){
 
 check_CICS(){
 	chk_prod="CICS-5.2"
-	echo "Checking CICS reqs" >&2
 	CHK_CSI=${CICS52_CSI}
 	fmid_check='y'
 	sysmods='HCI6900'
@@ -94,7 +91,6 @@ check_CICS(){
 
 check_LE(){
 	chk_prod="LE"
-	echo "Checking LE reqs" >&2
 	CHK_CSI=${CEE_CSI}
 	case ${release} in
 		'02.00' ) sysmods='UI30573 UI31702 UI33265 UI43053 UI45429 UI43458 UI49699 UI53511 UI53889 UI54726 UI56507 UI61245 UI29282';;
@@ -112,7 +108,6 @@ sysmod_Check(){
 	if [ "${sysmods}" = '' ]; then
 		return 0
 	fi
-	echo ${CHK_CSI}
 	if [ "${CHK_CSI}" = "NONE" ]; then
 		echo "No SMP/E CSI specified for ${chk_prod}. Pre-requisites are assumed ok"
 		return 0
