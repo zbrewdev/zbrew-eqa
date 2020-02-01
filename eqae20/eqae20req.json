@@ -41,12 +41,12 @@
 		"coreq":
 		[  
 			{  
-			"prodid":"HCI",
+			"prodid":"DFH",
 			"description":"CICS TS for z/OS",
 			"release":
 			[
 				{
-				"relid":"HCI520",
+				"relid":"DFH520",
 				"fmids": [
 					{
 					"fmid":"HCI6900",
