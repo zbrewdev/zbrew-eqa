@@ -13,10 +13,9 @@ mydir=$(callerdir "${0}")
 props="${mydir}/../../zbrew/properties/globalprops.json"
 zbrewpropse zbrew global ${props}
 
-check_HLASM() {
-	chk_prod="HLASM"
-	echo "Checking HLASM reqs"
-	CHK_CSI=${HLASM_CSI}
+check_HMQ() {
+	chk_prod="HMQ"
+	CHK_CSI=${HMQ_CSI}
 	fmid_check='y'
 	sysmods='HMQ4160'
 	sysmod_Check
@@ -33,12 +32,11 @@ check_HLASM() {
 }
 
 
-check_COBOL(){
-	chk_prod="COBOL-${cobver}"
-	echo "Checking Cobol-${cobver} reqs"
-	eval CHK_CSI=$"COBOL${cobver}_CSI"
+check_IGY(){
+	chk_prod="IGY-${igyver}"
+	eval CHK_CSI=$"IGY${igyver}_CSI"
 	fmid_check='y'
-	case ${cobver} in
+	case ${igyver} in
 		51 )
 			fmid='HADB510'
 			ptfs='UI62769 UI63486 UI63637'
@@ -73,7 +71,6 @@ check_COBOL(){
 
 check_CICS(){
 	chk_prod="CICS-5.2"
-	echo "Checking CICS reqs"
 	CHK_CSI=${CICS52_CSI}
 	fmid_check='y'
 	sysmods='HCI6900'
@@ -94,7 +91,6 @@ check_CICS(){
 
 check_LE(){
 	chk_prod="LE"
-	echo "Checking LE reqs"
 	CHK_CSI=${CEE_CSI}
 	case ${release} in
 		'02.00' ) sysmods='UI30573 UI31702 UI33265 UI43053 UI45429 UI43458 UI49699 UI53511 UI53889 UI54726 UI56507 UI61245 UI29282';;
@@ -112,7 +108,6 @@ sysmod_Check(){
 	if [ "${sysmods}" = '' ]; then
 		return 0
 	fi
-
 	if [ "${CHK_CSI}" = "NONE" ]; then
 		echo "No SMP/E CSI specified for ${chk_prod}. Pre-requisites are assumed ok"
 		return 0
@@ -168,10 +163,10 @@ check_LE
 
 check_CICS
 
-check_HLASM
+check_HMQ
 
-for cobver in 51 52 61 62; do
-	check_COBOL
+for igyver in 51 52 61 62; do
+	check_IGY
 done
 
 exit $rc
