@@ -5,11 +5,7 @@
 			"ZFSROOT":"/zbrew/", 
 			"ZFSDIR":"usr/lpp/IBM/debug/", 
 			"LEAVES":"IBM", 
-			"CEEHLQ":"CEE", 
-			"CSSHLQ":"SYS1", 
-			"TCPHLQ":"TCPIP", 
-			"ISPHLQ":"ISP", 
-			"CALLLIBS":"\"${CEEHLQ}.SCEELKED ${CSSHLQ}.CSSLIB ${TCPHLQ}.SEZATCP ${ISPHLQ}.SISPLOAD\""
+			"CALLLIBS":"\"${CEEHLQ}.SCEELKED ${CSSHLQ}.CSSLIB ${EZAHLQ}.SEZATCP ${ISPHLQ}.SISPLOAD\""
 		 }
 	}] 
 }

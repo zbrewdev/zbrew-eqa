@@ -13,9 +13,10 @@ mydir=$(callerdir "${0}")
 props="${mydir}/../../zbrew/properties/globalprops.json"
 zbrewpropse zbrew global ${props}
 
-check_HMQ() {
-	chk_prod="HMQ"
-	CHK_CSI=${HMQ_CSI}
+check_ASM() {
+	chk_prod="ASM"
+	CHK_CSI=${ASM160_CSI}
+
 	fmid_check='y'
 	sysmods='HMQ4160'
 	sysmod_Check
@@ -37,19 +38,20 @@ check_IGY(){
 	eval CHK_CSI=$"IGY${igyver}_CSI"
 	fmid_check='y'
 	case ${igyver} in
-		51 )
+
+		510 )
 			fmid='HADB510'
 			ptfs='UI62769 UI63486 UI63637'
 			;;
-		52 )
+		520 )
 			fmid='HADB520'
 			ptfs='UI42823 UI47619 UI62754 UI63478 UI63640'
 			;;
-		61 )
+		610 )
 			fmid='HADB610'
 			ptfs='UI43370 UI48286 UI57900'
 			;;
-		62 )
+		620 )
 			fmid='HADB620'
 			ptfs='UI57342'
 			;;
@@ -69,9 +71,11 @@ check_IGY(){
 
 
 
-check_CICS(){
+check_DFH(){
 	chk_prod="CICS-5.2"
-	CHK_CSI=${CICS52_CSI}
+
+	CHK_CSI=${DFH520_CSI}
+
 	fmid_check='y'
 	sysmods='HCI6900'
 	sysmod_Check
@@ -89,13 +93,23 @@ check_CICS(){
 
 
 
-check_LE(){
+check_CEE(){
 	chk_prod="LE"
 	CHK_CSI=${CEE_CSI}
+
 	case ${release} in
-		'02.00' ) sysmods='UI30573 UI31702 UI33265 UI43053 UI45429 UI43458 UI49699 UI53511 UI53889 UI54726 UI56507 UI61245 UI29282';;
-		'03.00' ) sysmods='UI50167 UI53807 UI53820 UI56511 UI61244';;
-		'04.00' ) sysmods='';;
+		'02.00' ) 
+			sysmods='UI30573 UI31702 UI33265 UI43053 UI45429 UI43458 UI49699 UI53511 UI53889 UI54726 UI56507 UI61245 UI29282'
+			CHK_CSI=${CEE220_CSI}
+			;;
+		'03.00' ) 
+			sysmods='UI50167 UI53807 UI53820 UI56511 UI61244'
+			CHK_CSI=${CEE230_CSI}
+			;;
+		'04.00' ) 
+			sysmods=''
+			CHK_CSI=${CEE240_CSI}
+			;;
 		* ) echo "z/OS 2.${release} not supported for EQAE20";;
 	esac
 	sysmod_Check 
@@ -159,13 +173,16 @@ if [ "${version}" != "02" ]; then
 fi
 release=`echo ${zosinfo} | awk '{ print $2; }'`
 
-check_LE 
+check_CEE 
 
-check_CICS
+check_DFH
 
 check_HMQ
 
 for igyver in 51 52 61 62; do
+check_ASM
+
+for igyver in 510 520 610 620; do
 	check_IGY
 done
 

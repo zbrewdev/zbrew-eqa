@@ -329,11 +329,11 @@
 			{
 				"dsname":"SEQAZFS",
 				"dstype":"ZFS",
-				"recfm":"1200",
-				"lrecl":"150",
-				"primary":"",
-				"secondary":"",
-				"zones":["T"]
+				"primary":"1200",
+				"secondary":"150",
+				"zones":["T"],
+				"dddefpath":"",
+				"mountpnt":""
 			},
 			{
 				"dsname":"SABJMODJ",
@@ -856,13 +856,6 @@
 				"primary":"1",
 				"secondary":"1",
 				"zones":["D"]
-			},
-			{
-				"dsname":"SEQAZFS",
-				"dstype":"ZFS",
-				"primary":"1200",
-				"secondary":"150",
-				"zones":["T"]
 			}
 		]
 	}]
