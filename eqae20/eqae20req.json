@@ -1,0 +1,138 @@
+{ 
+	"software": [{ 
+		"relid":"EQAE20", 
+		"description":"IBM z/OS Debugger 14.2.0",
+		"prereq":
+		[
+			{  
+			"prodid":"CEE",
+			"description":"Language Environment",
+			"release":
+			[
+				{
+				"relid":"CEE220",
+				"fmids": [
+					{
+					"fmid":"HLE77A0",
+					"description":"Language environment for z/OS 2.2",
+					"ptfs":	[ 
+						"UI50167","UI53807","UI53820","UI56511","UI61244"
+					]
+					}
+				]
+				},
+				{  
+				"relid":"CEE230",
+				"fmids": [
+					{
+					"fmid":"HLE77B0",
+					"description":"Language environment for z/OS 2.3",
+					"ptfs": [ 
+						"UI30573","UI31702","UI33265","UI43053","UI45429",
+						"UI43458","UI49699","UI53511","UI53889","UI54726",
+						"UI56507","UI61245","UI29282"
+					]
+					}
+				]
+				}
+			]
+			}
+		],
+		"coreq":
+		[  
+			{  
+			"prodid":"DFH",
+			"description":"CICS TS for z/OS",
+			"release":
+			[
+				{
+				"relid":"DFH520",
+				"fmids": [
+					{
+					"fmid":"HCI6900",
+					"description":"CICS TS for z/OS 5.2",
+					"ptfs":	[
+						"UI22206","UI30410"
+					]
+					}
+				]
+				}
+			]
+			},
+			{  
+			"prodid":"IGY",
+			"description":"Enterprise COBOL for z/OS",
+			"release":
+			[
+				{
+				"relid":"IGY510",
+				"fmids": [
+					{
+					"fmid":"HADB510",
+					"description":"Enterprise COBOL	for z/OS 5.1",
+					"ptfs":	[
+						"UI62769","UI63486","UI63637"
+					]
+					}
+				]
+				},
+				{
+				"relid":"IGY520",
+				"fmids": [
+					{
+					"fmid":"HADB520",
+					"description":"Enterprise COBOL	for z/OS 5.2",
+					"ptfs":	[
+						"UI42823","UI47619","UI62754","UI63478","UI63640"
+					]
+					}
+				]
+				},
+				{
+				"relid":"IGY610",
+				"fmids": [
+					{
+					"fmid":"HADB610",
+					"description":"Enterprise COBOL	for z/OS 6.1",
+					"ptfs":	[
+						"UI43370","UI48286","UI57900"
+					]
+					}
+				]
+				},
+				{
+				"relid":"IGY620",
+				"fmids": [
+					{
+					"fmid":"HADB620",
+					"description":"Enterprise COBOL	for z/OS 6.2",
+					"ptfs":	[
+						"UI57342"
+					]
+					}
+				]
+				}
+			]
+			},
+			{  
+			"prodid":"HMQ",
+			"description":"High Level Assembler for MVS & VM & VSE",
+			"release":
+			[
+				{
+				"relid":"HMQ160",
+				"fmids": [
+					{
+					"fmid":"HMQ4160",
+					"description":"High Level Assembler for	MVS & VM & VSE V1.6",
+					"ptfs":	[
+						"UK47103","UK59311"
+					]
+					}
+				]
+				}
+			]
+			}
+		 ]
+	}] 
+}

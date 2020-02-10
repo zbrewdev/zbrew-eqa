@@ -16,6 +16,7 @@ zbrewpropse zbrew global ${props}
 check_ASM() {
 	chk_prod="ASM"
 	CHK_CSI=${ASM160_CSI}
+
 	fmid_check='y'
 	sysmods='HMQ4160'
 	sysmod_Check
@@ -37,6 +38,7 @@ check_IGY(){
 	eval CHK_CSI=$"IGY${igyver}_CSI"
 	fmid_check='y'
 	case ${igyver} in
+
 		510 )
 			fmid='HADB510'
 			ptfs='UI62769 UI63486 UI63637'
@@ -71,7 +73,9 @@ check_IGY(){
 
 check_DFH(){
 	chk_prod="CICS-5.2"
+
 	CHK_CSI=${DFH520_CSI}
+
 	fmid_check='y'
 	sysmods='HCI6900'
 	sysmod_Check
@@ -91,6 +95,8 @@ check_DFH(){
 
 check_CEE(){
 	chk_prod="LE"
+	CHK_CSI=${CEE_CSI}
+
 	case ${release} in
 		'02.00' ) 
 			sysmods='UI30573 UI31702 UI33265 UI43053 UI45429 UI43458 UI49699 UI53511 UI53889 UI54726 UI56507 UI61245 UI29282'
@@ -171,6 +177,9 @@ check_CEE
 
 check_DFH
 
+check_HMQ
+
+for igyver in 51 52 61 62; do
 check_ASM
 
 for igyver in 510 520 610 620; do
