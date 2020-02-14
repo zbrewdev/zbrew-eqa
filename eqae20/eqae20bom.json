@@ -160,6 +160,7 @@
 				"dstype":"PDS",
 				"recfm":"U",
 				"lrecl":"0",
+				"dirblks":"15",
 				"primary":"3",
 				"secondary":"2",
 				"zones":["T"]
@@ -340,6 +341,7 @@
 				"dstype":"PDS",
 				"recfm":"U",
 				"lrecl":"0",
+				"dirblks":"15",
 				"primary":"80",
 				"secondary":"2",
 				"zones":["T"]
@@ -448,6 +450,7 @@
 				"dstype":"PDS",
 				"recfm":"U",
 				"lrecl":"0",
+				"dirblks":"15",
 				"primary":"50",
 				"secondary":"5",
 				"zones":["T"]
@@ -511,6 +514,7 @@
 				"dstype":"PDS",
 				"recfm":"U",
 				"lrecl":"0",
+				"dirblks":"10",
 				"primary":"50",
 				"secondary":"5",
 				"zones":["D"]
@@ -682,6 +686,7 @@
 				"dstype":"PDS",
 				"recfm":"U",
 				"lrecl":"0",
+				"dirblks":"15",
 				"primary":"70",
 				"secondary":"1",
 				"zones":["T"]
@@ -772,6 +777,7 @@
 				"dstype":"PDS",
 				"recfm":"U",
 				"lrecl":"0",
+				"dirblks":"20",
 				"primary":"70",
 				"secondary":"1",
 				"zones":["D"]
