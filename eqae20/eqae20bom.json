@@ -2,6 +2,22 @@
 	"software": [{
 		"name":"EQAE20",
 		"datasets":[
+                        {
+                                "dsname":"${ZBREW_CEEHLQ}.SCEELKED",
+                                "zones":["C"]
+                        },
+                        {
+                                "dsname":"${ZBREW_EZAHLQ}.SEZATCP",
+                                "zones":["C"]
+                        },
+                        {
+                                "dsname":"${ZBREW_CSSHLQ}.CSSLIB",
+                                "zones":["C"]
+                        },
+                        {
+                                "dsname":"${ZBREW_ISPHLQ}.SISPLOAD",
+                                "zones":["C"]
+                        },
 			{
 				"dsname":"AEQAMOD",
 				"dstype":"PDSE",
@@ -333,8 +349,9 @@
 				"primary":"1200",
 				"secondary":"150",
 				"zones":["T"],
-				"dddefpath":"",
-				"mountpnt":""
+				"dddefpath":"usr/lpp/IBM/debug/",
+				"mountpnt":"usr/lpp/IBM/debug/",
+                                "leaves":"IBM"
 			},
 			{
 				"dsname":"SABJMODJ",

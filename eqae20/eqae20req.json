@@ -126,12 +126,12 @@
 			]
 			},
 			{  
-			"prodid":"HMQ",
+			"prodid":"ASM",
 			"description":"High Level Assembler for MVS & VM & VSE",
 			"release":
 			[
 				{
-				"relid":"HMQ160",
+				"relid":"ASM160",
 				"fmids": [
 					{
 					"fmid":"HMQ4160",
