@@ -1,0 +1,16 @@
+#!/bin/sh
+# Need to perform product disablement 
+
+id="5737-I22"
+
+out=$(whence zbrewfuncs >/dev/null)
+if [ $? -eq 0 ]; then
+	. zbrewfuncs
+else
+    	echo "zbrew tools need to be in your PATH"
+	exit 4
+fi
+
+swregistrar "eqae20" "disable" "${id}"
+rc=$?
+exit $rc

@@ -1,3 +1,22 @@
 #!/bin/sh
-# to be written
-exit 0
+# Need to perform product enablement 
+
+id="5737-I22"
+enablementText="PRODUCT OWNER('IBM CORP')               
+        NAME('IBM Z OPEN DEV')              
+        ID(${id})                    
+        VERSION(*) RELEASE(*) MOD(*)    
+        FEATURENAME('IDz-DEBUGGER')
+        STATE(ENABLED)"
+
+out=$(whence zbrewfuncs >/dev/null)
+if [ $? -eq 0 ]; then
+	. zbrewfuncs
+else
+    	echo "zbrew tools need to be in your PATH"
+	exit 4
+fi
+
+swregistrar "eqae20" "enable" "${id}" "${enablementText}"
+rc=$?
+exit $rc
