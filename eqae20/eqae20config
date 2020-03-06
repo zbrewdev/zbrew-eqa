@@ -1,6 +1,8 @@
 #!/bin/sh
 # Need to perform product enablement 
 
+update=0
+
 id="5737-I22"
 enablementText="PRODUCT OWNER('IBM CORP')               
         NAME('IBM Z OPEN DEV')              
@@ -16,7 +18,66 @@ else
     	echo "zbrew tools need to be in your PATH"
 	exit 4
 fi
+	
+mydir=$(callerdir ${0})
+props="${mydir}/../../zbrew/properties/globalprops.json"
+zbrewpropse zbrew global "${props}"
+
+props="${mydir}/../../zbrew/properties/zbrewprops.json"
+zbrewpropse zbrew config "${props}"
 
 swregistrar "eqae20" "enable" "${id}" "${enablementText}"
 rc=$?
+if [ $rc -gt 0 ]; then
+	exit $rc
+fi
+
+script="${ZBREW_TMP}/eqae20update.sh"
+
+echo "#!/bin/sh" >"${script}"
+if [ $? -gt 0 ]; then
+	echo "Unable to create EQAE20 Update script: ${script}." >&2
+	exit 16
+fi
+echo "ZBREW_HLQ=${ZBREW_HLQ}" >>${script}
+echo "ZBREW_TMP=${ZBREW_TMP}" >>${script}
+echo "ZBREW_PARMLIB_SFX=${ZBREW_PARMLIB_SFX}" >>${script}
+
+cat << 'EOF' >>${script}
+set -x
+# Clean up old SVCs
+svclist="EQA00SVC EQA01SVC IGC0014E IGX00051"
+for svc in $svclist; do
+	mrm "SYS1.LPALIB(${svc})" 2>/dev/null
+done
+
+info=`dls -l ${ZBREW_HLQ}EQAE20.SEQAAUTH`
+if [ $? -gt 0 ]; then
+	echo "Unexpected error. Debug dataset: ${ZBREW_HLQ}.EQAE20.SEQAAUTH not found." >&2
+	exit 16
+fi
+volume=`echo "${info}" | awk '{ print $5; }'`
+opercmd "d sms,volume(${volume})" 2>/dev/null | grep "NOT AN SMS MANAGED DASD VOLUME"
+if [ $? -gt 0 ]; then
+	volume="SMS"
+fi
+
+mem="PROG${ZBREW_PARMLIB_SFX}"
+progmem="${ZBREW_HLQ}PARMLIB(${mem})"
+dls "${ZBREW_HLQ}PARMLIB" 2>/dev/null
+if [ $? -gt 0 ]; then
+	dtouch -tpds "${ZBREW_HLQ}PARMLIB"
+fi
+mls "${progmem}" 2>/dev/null
+if [ $? -eq 0 ]; then
+	flag="-a"
+else
+	flag=
+fi
+
+decho ${flag} "APF ADD DSNAME(${ZBREW_HLQ}SEQAAUTH) ${volume}" "${progmem}"
+
+EOF
+
+chmod u+x ${script}
 exit $rc
