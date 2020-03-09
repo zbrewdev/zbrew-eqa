@@ -349,7 +349,7 @@
 				"primary":"1200",
 				"secondary":"150",
 				"zones":["T"],
-				"dddefpath":"usr/lpp/IBM/debug/",
+				"dddefpath":"usr/lpp/IBM/debug/IBM/",
 				"mountpnt":"usr/lpp/IBM/debug/",
                                 "leaves":"IBM"
 			},
