@@ -16,7 +16,7 @@ zbrewpropse zbrew global "${props}"
 props="${mydir}/../../zbrew/properties/zbrewprops.json"
 zbrewpropse zbrew config "${props}"
 
-eqaRoot="${ZBREW_CONFIGROOT}/eqae20"
+eqaRoot="${ZBREW_CONFIGROOT}/config/eqae20"
 regScript="${eqaRoot}/1_swregister.sh"
 apfAuthScript="${eqaRoot}/2_apfauth.sh"
 
@@ -27,11 +27,11 @@ if [ $rc -gt 0 ]; then
 	exit $rc
 fi
 
-eqae20configregistration ${regScript}
+eqae20configregistration ENABLE ${regScript}
 if [ $? -gt 0 ]; then
 	exit $?
 fi
-eqae20configapfauthorization ${apfAuthScript}
+eqae20configapfauthorization ENABLE ${apfAuthScript}
 if [ $? -gt 0 ]; then
 	exit $?
 fi

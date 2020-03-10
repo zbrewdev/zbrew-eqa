@@ -1,31 +1,30 @@
 #!/bin/sh
 
-if ! [ $# -eq 1 ]; then
-	echo "Syntax: registration <output-script>" >&2
+if ! [ $# -eq 2 ]; then
+	echo "Syntax: registration ENABLE|DISABLE <output-script>" >&2
 	exit 8
 fi
-script="$1"
+verb="$1"
+script="$2"
 
 zbrew=`whence zbrew`
 zbrewdir=${zbrew%/*} 
+zbrewroot=${zbrewdir%/*}
 
 cat << EOF >${script}
 #!/bin/sh
 #set -x
 export PATH=${zbrewdir}:\$PATH
-. zbrewsetenv
+. zbrewsetenv ${zbrewroot}
+
+apfregistrar eqae20 "${verb}" "\${ZBREW_HLQ}EQAE20.SEQAAUTH"
+exit $?
 EOF
 
 if [ $? -gt 0 ]; then
 	echo "Unable to create EQAE20 Update script: ${script}." >&2
 	exit 16
 fi
-
-cat << 'EOF' >>${script}
-
-apfregistrar eqae20 enable "${ZBREW_HLQ}EQAE20.SEQAAUTH"
-exit $?
-EOF
 
 chmod u+x "${script}"
 exit 0
