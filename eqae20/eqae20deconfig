@@ -26,11 +26,11 @@ if [ $rc -gt 0 ]; then
 	exit $rc
 fi
 
-eqae20configregistration DISABLE ${regScript}
+${mydir}/eqae20configregistration DISABLE ${regScript}
 if [ $? -gt 0 ]; then
 	exit $?
 fi
-eqae20configapfauthorization DISABLE ${apfAuthScript}
+${mydir}/eqae20configapfauthorization DISABLE ${apfAuthScript}
 if [ $? -gt 0 ]; then
 	exit $?
 fi
