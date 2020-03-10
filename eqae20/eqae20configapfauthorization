@@ -22,11 +22,6 @@ if [ $? -gt 0 ]; then
 fi
 
 cat << 'EOF' >>${script}
-# Clean up old SVCs
-svclist="EQA00SVC EQA01SVC IGC0014E IGX00051"
-for svc in $svclist; do
-	mrm "SYS1.LPALIB(${svc})" 2>/dev/null
-done
 
 apfregistrar eqae20 enable "${ZBREW_HLQ}EQAE20.SEQAAUTH"
 exit $?
