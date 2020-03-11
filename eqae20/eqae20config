@@ -1,14 +1,6 @@
 #!/bin/sh
 # Need to perform product enablement 
 
-id="5737-I22"
-enablementText="PRODUCT OWNER('IBM CORP')               
-        NAME('IBM Z OPEN DEV')              
-        ID(${id})                    
-        VERSION(*) RELEASE(*) MOD(*)    
-        FEATURENAME('IDz-DEBUGGER')
-        STATE(ENABLED)"
-
 out=$(whence zbrewfuncs >/dev/null)
 if [ $? -eq 0 ]; then
 	. zbrewfuncs
@@ -16,7 +8,32 @@ else
     	echo "zbrew tools need to be in your PATH"
 	exit 4
 fi
+	
+mydir=$(callerdir ${0})
+props="${mydir}/../../zbrew/properties/globalprops.json"
+zbrewpropse zbrew global "${props}"
 
-swregistrar "eqae20" "enable" "${id}" "${enablementText}"
+props="${mydir}/../../zbrew/properties/zbrewprops.json"
+zbrewpropse zbrew config "${props}"
+
+eqaRoot="${ZBREW_CONFIGROOT}/config/eqae20"
+regScript="${eqaRoot}/1_swregister.sh"
+apfAuthScript="${eqaRoot}/2_apfauth.sh"
+
+mkdir -p "${eqaRoot}"
 rc=$?
-exit $rc
+if [ $rc -gt 0 ]; then
+	echo "Unable to create configuration directory: ${eqaRoot}"
+	exit $rc
+fi
+
+eqae20configregistration ENABLE ${regScript}
+if [ $? -gt 0 ]; then
+	exit $?
+fi
+eqae20configapfauthorization ENABLE ${apfAuthScript}
+if [ $? -gt 0 ]; then
+	exit $?
+fi
+
+exit 0

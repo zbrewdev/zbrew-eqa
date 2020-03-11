@@ -1,7 +1,4 @@
 #!/bin/sh
-# Need to perform product disablement 
-
-id="5737-I22"
 
 out=$(whence zbrewfuncs >/dev/null)
 if [ $? -eq 0 ]; then
@@ -10,7 +7,32 @@ else
     	echo "zbrew tools need to be in your PATH"
 	exit 4
 fi
+	
+mydir=$(callerdir ${0})
+props="${mydir}/../../zbrew/properties/globalprops.json"
+zbrewpropse zbrew global "${props}"
 
-swregistrar "eqae20" "disable" "${id}"
+props="${mydir}/../../zbrew/properties/zbrewprops.json"
+zbrewpropse zbrew config "${props}"
+
+eqaRoot="${ZBREW_CONFIGROOT}/deconfig/eqae20"
+apfAuthScript="${eqaRoot}/1_apfauth.sh"
+regScript="${eqaRoot}/2_swregister.sh"
+
+mkdir -p "${eqaRoot}"
 rc=$?
-exit $rc
+if [ $rc -gt 0 ]; then
+	echo "Unable to create de-configuration directory: ${eqaRoot}"
+	exit $rc
+fi
+
+${mydir}/eqae20configregistration DISABLE ${regScript}
+if [ $? -gt 0 ]; then
+	exit $?
+fi
+${mydir}/eqae20configapfauthorization DISABLE ${apfAuthScript}
+if [ $? -gt 0 ]; then
+	exit $?
+fi
+
+exit 0

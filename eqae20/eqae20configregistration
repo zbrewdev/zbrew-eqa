@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+# This should get pulled into the BOM for EQAE20 and general configure from zbrew
+#
+
+if ! [ $# -eq 2 ]; then
+	echo "Syntax: configregistration ENABLE|DISABLE <output-script>" >&2
+	exit 8
+fi
+verb="$1"
+script="$2"
+zbrew=`whence zbrew`
+zbrewdir=${zbrew%/*}
+zbrewroot=${zbrewdir%/*}
+
+cat << EOF >${script}
+#!/bin/sh
+#set -x
+export PATH=${zbrewdir}:\$PATH
+. zbrewsetenv ${zbrewroot}
+
+id="5737-I22"
+enablementText="PRODUCT OWNER('IBM CORP')
+	NAME('IBM Z OPEN DEV')
+	ID(\${id})
+	VERSION(*) RELEASE(*) MOD(*)
+	FEATURENAME('IDz-DEBUGGER')
+	STATE(ENABLED)"
+
+swregistrar "eqae20" "${verb}" "\${id}" "${enablementText}"
+EOF
+
+if [ $? -gt 0 ]; then
+	echo "Unable to create EQAE20 Update script: ${script}." >&2
+	exit 16
+fi
+
+chmod u+x "${script}"
+exit 0
