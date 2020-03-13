@@ -9,13 +9,10 @@ else
 fi
 	
 mydir=$(callerdir ${0})
-props="${mydir}/../../zbrew/properties/globalprops.json"
-zbrewpropse zbrew global "${props}"
-
-props="${mydir}/../../zbrew/properties/zbrewprops.json"
+props="${mydir}/../../zbrew/zbrewglobalprops.json"
 zbrewpropse zbrew config "${props}"
 
-eqaRoot="${ZBREW_CONFIGROOT}/deconfig/eqae20"
+eqaRoot="${ZBREW_WORKROOT}/deconfig/eqae20"
 apfAuthScript="${eqaRoot}/1_apfauth.sh"
 regScript="${eqaRoot}/2_swregister.sh"
 

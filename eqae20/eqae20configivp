@@ -1,23 +1,23 @@
 #!/bin/sh
 
-if ! [ $# -eq 2 ]; then
-	echo "Syntax: registration ENABLE|DISABLE <output-script>" >&2
+if ! [ $# -eq 1 ]; then
+	echo "Syntax: ivp <output-script>" >&2
 	exit 8
 fi
-verb="$1"
-script="$2"
+script="$1"
 
 zbrew=`whence zbrew`
 zbrewdir=${zbrew%/*} 
 zbrewroot=${zbrewdir%/*}
 
+absoluteIVP=`whence eqae20ivp`
 cat << EOF >${script}
 #!/bin/sh
 #set -x
 export PATH=${zbrewdir}:\$PATH
 . zbrewsetenv ${zbrewroot}
 
-apfregistrar eqae20 "${verb}" "\${ZBREW_TGT_HLQ}EQAE20.SEQAAUTH"
+${absoluteIVP} 
 exit $?
 EOF
 
