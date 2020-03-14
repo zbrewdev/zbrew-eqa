@@ -10,14 +10,13 @@ zbrew=`whence zbrew`
 zbrewdir=${zbrew%/*} 
 zbrewroot=${zbrewdir%/*}
 
-absoluteIVP=`whence eqae20ivp`
 cat << EOF >${script}
 #!/bin/sh
 #set -x
 export PATH=${zbrewdir}:\$PATH
 . zbrewsetenv ${zbrewroot}
 
-${absoluteIVP} 
+\${ZBREW_WORKROOT}/zbrew-eqa/eqae20/eqae20ivp
 exit $?
 EOF
 

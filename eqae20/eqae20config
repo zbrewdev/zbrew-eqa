@@ -16,6 +16,7 @@ zbrewpropse zbrew config "${props}"
 eqaRoot="${ZBREW_WORKROOT}/config/eqae20"
 regScript="${eqaRoot}/1_swregister.sh"
 apfAuthScript="${eqaRoot}/2_apfauth.sh"
+ivpScript="${eqaRoot}/3_ivp.sh"
 
 mkdir -p "${eqaRoot}"
 rc=$?
@@ -29,6 +30,10 @@ if [ $? -gt 0 ]; then
 	exit $?
 fi
 ${mydir}/eqae20configapfauthorization ENABLE ${apfAuthScript}
+if [ $? -gt 0 ]; then
+	exit $?
+fi
+${mydir}/eqae20configivp ${ivpScript}
 if [ $? -gt 0 ]; then
 	exit $?
 fi
