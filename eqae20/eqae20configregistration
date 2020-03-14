@@ -27,7 +27,7 @@ enablementText="PRODUCT OWNER('IBM CORP')
 	FEATURENAME('IDz-DEBUGGER')
 	STATE(ENABLED)"
 
-swregistrar "eqae20" "${verb}" "\${id}" "${enablementText}"
+swregistrar "eqae20" "${verb}" "\${id}" "\${enablementText}"
 EOF
 
 if [ $? -gt 0 ]; then

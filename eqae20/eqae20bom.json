@@ -354,16 +354,6 @@
                                 "leaves":"IBM"
 			},
 			{
-				"dsname":"SABJMODJ",
-				"dstype":"PDS",
-				"recfm":"U",
-				"lrecl":"0",
-				"dirblks":"15",
-				"primary":"80",
-				"secondary":"2",
-				"zones":["T"]
-			},
-			{
 				"dsname":"SABJSAMJ",
 				"dstype":"PDSE",
 				"recfm":"FB",
@@ -407,15 +397,6 @@
 				"primary":"2",
 				"secondary":"2",
 				"zones":["T"]
-			},
-			{
-				"dsname":"AABJMODJ",
-				"dstype":"PDSE",
-				"recfm":"U",
-				"lrecl":"0",
-				"primary":"80",
-				"secondary":"2",
-				"zones":["D"]
 			},
 			{
 				"dsname":"AABJSAMJ",
