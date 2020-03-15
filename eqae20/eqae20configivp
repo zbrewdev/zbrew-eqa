@@ -14,7 +14,7 @@ cat << EOF >${script}
 #!/bin/sh
 #set -x
 export PATH=${zbrewdir}:\$PATH
-. zbrewsetenv ${zbrewroot}
+. zbrewsetenv
 
 \${ZBREW_WORKROOT}/zbrew-eqa/eqae20/eqae20ivp
 exit $?

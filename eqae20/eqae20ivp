@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. zbrewsetenv
+
 copyasciifile() {
 	iconvsrc=$1
 	iconvtgt=$2
@@ -19,7 +21,6 @@ copyasciifile() {
 }
 
 cleanup() {
-set +x
 	msg="$1"
 	keepds="$2"
 	keepmem="$3"

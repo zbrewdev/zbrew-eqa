@@ -1,16 +1,6 @@
 #!/bin/sh
 
-out=$(whence zbrewfuncs >/dev/null)
-if [ $? -eq 0 ]; then
-	. zbrewfuncs
-else
-    	echo "zbrew tools need to be in your PATH"
-	exit 4
-fi
-	
-mydir=$(callerdir ${0})
-props="${mydir}/../../zbrew/zbrewglobalprops.json"
-zbrewpropse zbrew config "${props}"
+. zbrewsetenv
 
 eqaRoot="${ZBREW_WORKROOT}/deconfig/eqae20"
 apfAuthScript="${eqaRoot}/1_apfauth.sh"
