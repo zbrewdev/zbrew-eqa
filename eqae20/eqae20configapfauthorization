@@ -15,7 +15,7 @@ cat << EOF >${script}
 #!/bin/sh
 #set -x
 export PATH=${zbrewdir}:\$PATH
-. zbrewsetenv ${zbrewroot}
+. zbrewsetenv
 
 apfregistrar eqae20 "${verb}" "\${ZBREW_TGT_HLQ}EQAE20.SEQAAUTH"
 exit $?

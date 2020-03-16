@@ -17,7 +17,7 @@ cat << EOF >${script}
 #!/bin/sh
 #set -x
 export PATH=${zbrewdir}:\$PATH
-. zbrewsetenv ${zbrewroot}
+. zbrewsetenv
 
 id="5737-I22"
 enablementText="PRODUCT OWNER('IBM CORP')
@@ -27,7 +27,7 @@ enablementText="PRODUCT OWNER('IBM CORP')
 	FEATURENAME('IDz-DEBUGGER')
 	STATE(ENABLED)"
 
-swregistrar "eqae20" "${verb}" "\${id}" "${enablementText}"
+swregistrar "eqae20" "${verb}" "\${id}" "\${enablementText}"
 EOF
 
 if [ $? -gt 0 ]; then

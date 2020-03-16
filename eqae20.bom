@@ -1,8 +1,12 @@
 LICENSE
 README.md
+eqae20/dtivpa.as
+eqae20/dtivpa.cmd
 eqae20/eqae20bom.json
-eqae20/eqae20install.json
-eqae20/eqae20req.json
 eqae20/eqae20config
+eqae20/eqae20configapfauthorization
+eqae20/eqae20configivp
 eqae20/eqae20configregistration
-eqae20/eqae20configapfauthorization 
+eqae20/eqae20deconfig
+eqae20/eqae20ivp
+eqae20/eqae20req.json

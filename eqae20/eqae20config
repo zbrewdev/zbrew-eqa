@@ -1,21 +1,12 @@
 #!/bin/sh
 # Need to perform product enablement 
 
-out=$(whence zbrewfuncs >/dev/null)
-if [ $? -eq 0 ]; then
-	. zbrewfuncs
-else
-    	echo "zbrew tools need to be in your PATH"
-	exit 4
-fi
-	
-mydir=$(callerdir ${0})
-props="${mydir}/../../zbrew/zbrewglobalprops.json"
-zbrewpropse zbrew config "${props}"
+. zbrewsetenv
 
 eqaRoot="${ZBREW_WORKROOT}/config/eqae20"
 regScript="${eqaRoot}/1_swregister.sh"
 apfAuthScript="${eqaRoot}/2_apfauth.sh"
+ivpScript="${eqaRoot}/3_ivp.sh"
 
 mkdir -p "${eqaRoot}"
 rc=$?
@@ -24,11 +15,15 @@ if [ $rc -gt 0 ]; then
 	exit $rc
 fi
 
-eqae20configregistration ENABLE ${regScript}
+${mydir}/eqae20configregistration ENABLE ${regScript}
 if [ $? -gt 0 ]; then
 	exit $?
 fi
-eqae20configapfauthorization ENABLE ${apfAuthScript}
+${mydir}/eqae20configapfauthorization ENABLE ${apfAuthScript}
+if [ $? -gt 0 ]; then
+	exit $?
+fi
+${mydir}/eqae20configivp ${ivpScript}
 if [ $? -gt 0 ]; then
 	exit $?
 fi

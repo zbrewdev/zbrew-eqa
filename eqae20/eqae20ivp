@@ -1,3 +1,135 @@
 #!/bin/sh
 
+. zbrewsetenv
+
+copyasciifile() {
+	iconvsrc=$1
+	iconvtgt=$2
+	tmp=${ZBREW_TMP}/$$.iconv
+	iconv -fISO8859-1 -tIBM-1047 <"${iconvsrc}" >"${tmp}"
+	if [ $? -gt 0 ]; then
+		"IVP: iconv failed copying from "${src}" to temporary file: ${tmp}" >&2
+		return 16
+	fi
+	dcp "${tmp}" "${iconvtgt}"
+	if [ $? -gt 0 ]; then
+		"IVP: dcp failed copying from temporary file "${tmp}" to ${iconvtgt}" >&2
+		return 16
+	fi
+	rm ${tmp}
+	return 0
+}
+
+cleanup() {
+	msg="$1"
+	keepds="$2"
+	keepmem="$3"
+
+	rmlist=""	
+	for ds in ${datasets}; do
+		if [ "${ds}" = "${keepds}" ]; then
+			summary="Dataset: ${keepds}(${keepmem}) retained."
+			continue;
+		fi
+		rmlist="${ds} ${rmlist}"
+	done
+	drm -f "$rmlist"
+	echo "${msg} ${summary}" >&2
+	exit 16
+}
+
+# 
+# Run IVP for assembler, COBOL, PL/I and C
+#
+
+#
+# Create temporary datasets
+#
+src=`mvstmp ${ZBREW_TGT_HLQ}SRC`
+list=`mvstmp ${ZBREW_TGT_HLQ}LIST`
+adata=`mvstmp ${ZBREW_TGT_HLQ}ADATA`
+obj=`mvstmp ${ZBREW_TGT_HLQ}OBJ`
+langx=`mvstmp ${ZBREW_TGT_HLQ}LANGX`
+mod=`mvstmp ${ZBREW_TGT_HLQ}MOD`
+lib=`mvstmp ${ZBREW_TGT_HLQ}LIB`
+insplog=`mvstmp ${ZBREW_TGT_HLQ}INSP`
+sysprint=`mvstmp ${ZBREW_TGT_HLQ}PRT`
+sysout=`mvstmp ${ZBREW_TGT_HLQ}OUT`
+dbgcmd=`mvstmp ${ZBREW_TGT_HLQ}CMD`
+
+datasets="${src} ${list} ${adata} ${obj} ${langx} ${mod} ${lib} ${insplog} ${sysprint} ${sysout} ${dbgcmd}"
+
+dtouch -tpdse ${src}
+dtouch -tpdse -l1562 -rvb -s1m ${langx}
+dtouch -tpdse ${obj}
+dtouch -tpds -ru ${mod}
+dtouch -tpdse -ru ${lib}
+dtouch -tpdse -rvb -l32756 ${adata}
+dtouch -tpdse -rvb -l137 ${list}
+dtouch -tpdse -rfb -l72 ${insplog}
+dtouch -tpdse -rvb -l137 ${sysprint}
+dtouch -tpdse ${sysout}
+dtouch -tpdse ${dbgcmd}
+
+asmsrc=dtivpa.as
+pgm=DTIVPA
+#
+# assemble
+#
+copyasciifile "${ZBREW_WORKROOT}/zbrew-eqa/eqae20/${asmsrc}" "${src}(${pgm}AS)"
+rc=$?
+if [ $rc -gt 0 ]; then
+	cleanup "IVP: Copy of assembler source failed with rc: $rc. Source Dataset retained" "${src}" "${pgm}AS"
+fi
+
+mvscmd --pgm=ASMA90 --args='ADATA,OBJECT' --syslin="${obj}(${pgm})" --sysprint="${list}(${pgm}AS)" --sysadata="${adata}(${pgm}AS)" --syslib=${ZBREW_CEEHLQ}.SCEEMAC --sysin="${src}(${pgm}AS)"
+rc=$?
+if [ $rc -gt 0 ]; then
+	cleanup "IVP: Assemble failed with rc: $rc. Listing retained" "${list}" "${pgm}AS"
+fi
+
+#
+# Extract Debug Data into EQALANGX format
+#
+steplib="${ZBREW_TGT_HLQ}EQAE20.SIPVMODA:${ZBREW_CEEHLQ}.SCEERUN"
+mvscmd --pgm=EQALANGX --args='(ASM ERROR' --steplib="${steplib}" --sysadata="${adata}(${pgm}AS)" --idilangx="${langx}(${pgm}AS)" --sysprint="${sysprint}(${pgm}LG)"
+rc=$?
+if [ $rc -gt 0 ]; then
+	cleanup "IVP: EQALANGX failed with rc: $rc. $rc. SYSADATA retained" "${adata}" "${pgm}AS"
+fi
+
+#
+# Link assembler code 
+#
+mvscmd --pgm=HEWL --args='MAP' --syslib=${ZBREW_CEEHLQ}.SCEELKED --object=${obj} --syslmod=${mod} --sysprint="${list}(${pgm}LK)" --syslin=stdin <<zz
+  INCLUDE OBJECT(DTIVPA)
+  NAME DTIVPA(R)
+zz
+rc=$?
+if [ $rc -gt 0 ]; then
+	cleanup "IVP: Link failed with rc: $rc. Listing retained" "${list}" "${pgm}LK"
+fi
+
+#
+# Run assembler code under debugger
+#
+asmcmdsrc=dtivpa.cmd
+copyasciifile "${ZBREW_WORKROOT}/zbrew-eqa/eqae20/${asmcmdsrc}" "${dbgcmd}(${pgm}AS)"
+rc=$?
+if [ $rc -gt 0 ]; then
+	cleanup "IVP: Copy of debug command file failed with rc: $rc. Command file retained" "${dbgcmd}" "${pgm}AS"
+fi
+steplib="${mod}:${ZBREW_TGT_HLQ}EQAE20.SEQAMOD:${ZBREW_CEEHLQ}.SCEERUN"
+runargs="TEST(ERROR,INSPIN,,*)/"
+mvscmd --pgm=DTIVPA --args="${runargs}" --steplib="${steplib}" --eqalangx="${langx}(${pgm}AS)" --insplog="${insplog}(${pgm}AS)" --inspin="${dbgcmd}(${pgm}AS)" --sysout="${sysout}(${pgm}GO)" 
+
+rc=$?
+if [ $rc -gt 0 ]; then
+	cleanup "IVP: Run failed with rc: $rc. Listing retained" "${list}" "${pgm}GO"
+fi
+
+# msf - need to check the INSPLOG file (right now it is unable to load EQALANGX)
+#dcp "${insplog}(${pgm}AS)" /tmp/insplog
+
+drm -f "${datasets}"
 exit 0
