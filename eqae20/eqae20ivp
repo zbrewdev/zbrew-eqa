@@ -55,10 +55,11 @@ mod=`mvstmp ${ZBREW_TGT_HLQ}IVPMOD`
 lib=`mvstmp ${ZBREW_TGT_HLQ}IVPLIB`
 insplog=`mvstmp ${ZBREW_TGT_HLQ}IVPLOG`
 sysprint=`mvstmp ${ZBREW_TGT_HLQ}IVPPRT`
+pmap=`mvstmp ${ZBREW_TGT_HLQ}IVPPMAP`
 sysout=`mvstmp ${ZBREW_TGT_HLQ}IVPOUT`
 dbgcmd=`mvstmp ${ZBREW_TGT_HLQ}IVPCMD`
 
-datasets="${src} ${list} ${fblist} ${adata} ${obj} ${langx} ${mod} ${lib} ${insplog} ${sysprint} ${sysout} ${dbgcmd}"
+datasets="${src} ${list} ${fblist} ${pmap} ${adata} ${obj} ${langx} ${mod} ${lib} ${insplog} ${sysprint} ${sysout} ${dbgcmd}"
 
 dtouch -tpdse ${src}
 dtouch -tpds -l1562 -rvb -s1m ${langx}
@@ -66,7 +67,8 @@ dtouch -tpdse ${obj}
 dtouch -tpds -ru ${mod}
 dtouch -tpdse -ru ${lib}
 dtouch -tpdse -rvb -l32756 ${adata}
-dtouch -tpdse -rvb -l137 ${list}
+dtouch -tpdse -rvba -l137 ${list}
+dtouch -tpdse -rvba -l137 ${pmap}
 dtouch -tpdse -rfb -l133 ${fblist}
 dtouch -tpdse -rfb -l72 ${insplog}
 dtouch -tpdse -rvb -l137 ${sysprint}
@@ -82,16 +84,16 @@ pgm=DTIVPA
 #
 # assemble
 #
-copyasciifile "${ZBREW_WORKROOT}/zbrew-eqa/eqae20/${asmsrc}" "${src}(${pgm}AS)"
+copyasciifile "${ZBREW_WORKROOT}/zbrew-eqa/eqae20/${asmsrc}" "${src}(${pgm})"
 rc=$?
 if [ $rc -gt 0 ]; then
-	cleanup "IVP: Copy of assembler source failed with rc: $rc. Source Dataset retained" "${src}" "${pgm}AS"
+	cleanup "IVP: Copy of assembler source failed with rc: $rc. Source Dataset retained" "${src}" "${pgm}"
 fi
 
-mvscmd --pgm=ASMA90 --args='ADATA,OBJECT' --syslin="${obj}(${pgm})" --sysprint="${list}(${pgm}AS)" --sysadata="${adata}(${pgm})" --syslib=${ZBREW_CEEHLQ}.SCEEMAC --sysin="${src}(${pgm}AS)"
+mvscmd --pgm=ASMA90 --args='ADATA,OBJECT' --syslin="${obj}(${pgm})" --sysprint="${list}(${pgm})" --sysadata="${adata}(${pgm})" --syslib=${ZBREW_CEEHLQ}.SCEEMAC --sysin="${src}(${pgm})"
 rc=$?
 if [ $rc -gt 0 ]; then
-	cleanup "IVP: Assemble failed with rc: $rc. Listing retained" "${list}" "${pgm}AS"
+	cleanup "IVP: Assemble failed with rc: $rc. Listing retained" "${list}" "${pgm}"
 fi
 
 #
@@ -127,16 +129,15 @@ if [ $rc -gt 0 ]; then
 fi
 steplib="${mod}:${ZBREW_TGT_HLQ}EQAE20.SEQAMOD:${ZBREW_CEEHLQ}.SCEERUN"
 runargs="TEST(ERROR,INSPIN,,*)/"
-mvscmd --pgm=DTIVPA --args="${runargs}" --steplib="${steplib}" --eqalangx="${langx}(${pgm})" --insplog="${insplog}(${pgm})" --inspin="${dbgcmd}(${pgm})" --sysout="${sysout}(${pgm}GO)" 
+mvscmd --pgm=DTIVPA --args="${runargs}" --steplib="${steplib}" --eqalangx="${langx}(${pgm})" --insplog="${insplog}(${pgm})" --inspin="${dbgcmd}(${pgm})" --sysout="${sysout}(${pgm}G)" 
 
 rc=$?
 if [ $rc -gt 0 ]; then
-	cleanup "IVP: Run failed with rc: $rc. Listing retained" "${list}" "${pgm}GO"
+	cleanup "IVP: Run failed with rc: $rc. Listing retained" "${list}" "${pgm}G"
 fi
 
 # msf - need to check the INSPLOG file (right now it is unable to load EQALANGX)
 dcp "${insplog}(${pgm})" /tmp/asm.insplog
-
 
 # COBOL IVP
 cobsrc=progt.cobol
@@ -144,10 +145,10 @@ pgm=PROGT
 #
 # compile
 #
-copyasciifile "${ZBREW_WORKROOT}/zbrew-eqa/eqae20/${cobsrc}" "${src}(${pgm}COB)"
+copyasciifile "${ZBREW_WORKROOT}/zbrew-eqa/eqae20/${cobsrc}" "${src}(${pgm})"
 rc=$?
 if [ $rc -gt 0 ]; then
-        cleanup "IVP: Copy of COBOL source failed with rc: $rc. Source Dataset retained" "${src}" "${pgm}COB"
+        cleanup "IVP: Copy of COBOL source failed with rc: $rc. Source Dataset retained" "${src}" "${pgm}"
 fi
 
 tempdd='SYSUT1 SYSUT2 SYSUT3 SYSUT4 SYSUT5 SYSUT6 SYSUT7 SYSUT8 SYSUT9 SYSUT10 SYSUT11 SYSUT12 SYSUT13 SYSUT14 SYSUT15 SYSMDECK'
@@ -157,23 +158,23 @@ for dd in $tempdd; do
 done
 export steplib="${ZBREW_IGYHLQ}.SIGYCOMP:${ZBREW_CEEHLQ}.SCEERUN:${ZBREW_CEEHLQ}.SCEERUN2"
 export args="NONAME,NOTERM,TEST"
-mvscmd --pgm=IGYCRCTL --args="${args}" ${tempparm} --syslin="${obj}(${pgm})" --sysprint="${fblist}(${pgm}COB)" --sysin="${src}(${pgm}COB)"
+mvscmd --pgm=IGYCRCTL --args="${args}" ${tempparm} --syslin="${obj}(${pgm})" --sysprint="${fblist}(${pgm})" --sysin="${src}(${pgm})"
 rc=$?
 if [ $rc -gt 0 ]; then
-	cleanup "IVP: COBOL compile failed with rc: $rc. Listing retained" "${fblist}" "${pgm}COB"
+	cleanup "IVP: COBOL compile failed with rc: $rc. Listing retained" "${fblist}" "${pgm}"
 fi
 
 #
 # link
 #
 export syslib="${ZBREW_CEEHLQ}.SCEELKED:${ZBREW_CEEHLQ}.SCEELKEX"
-mvscmd --pgm=IEWBLINK --args="MAP" --object="${obj}(${pgm})" --syslib="${syslib}" --sysprint="${list}(${pgm}MAP)" --syslmod="${lib}(${pgm})" --syslin=stdin <<zz
+mvscmd --pgm=IEWBLINK --args="MAP" --object="${obj}(${pgm})" --syslib="${syslib}" --sysprint="${list}(${pgm}MP)" --syslmod="${lib}(${pgm})" --syslin=stdin <<zz
   INCLUDE OBJECT(${pgm})
   NAME ${pgm}(R)
 zz
 rc=$?
 if [ $rc -gt 0 ]; then
-	cleanup "IVP: COBOL link failed with rc: $rc. Listing retained" "${list}" "${pgm}MAP"
+	cleanup "IVP: COBOL link failed with rc: $rc. Listing retained" "${list}" "${pgm}MP"
 fi
 
 #
@@ -187,14 +188,73 @@ if [ $rc -gt 0 ]; then
 fi
 
 export steplib="${lib}:${ZBREW_TGT_HLQ}EQAE20.SEQAMOD:${ZBREW_CEEHLQ}.SCEERUN:${ZBREW_CEEHLQ}.SCEERUN2"
-mvscmd --pgm="${pgm}" --args='/TEST(,CMDS,;,*) TRAP(ON)' --steplib="${steplib}" --cmds="${dbgcmd}(${pgm})" --insplog="${insplog}(${pgm})" --sysout="${sysout}(${pgm}GO)"
+mvscmd --pgm="${pgm}" --args='/TEST(,CMDS,;,*) TRAP(ON)' --steplib="${steplib}" --cmds="${dbgcmd}(${pgm})" --insplog="${insplog}(${pgm})" --sysout="${sysout}(${pgm}G)"
 rc=$?
 if [ $rc -gt 0 ]; then
- 	cleanup "IVP: COBOL Run failed with rc: $rc. Listing retained" "${list}" "${pgm}GO"
+ 	cleanup "IVP: COBOL Run failed with rc: $rc. Listing retained" "${list}" "${pgm}G"
 fi
 
 # msf - need to check the INSPLOG file (right now it is unable to load EQALANGX)
 dcp "${insplog}(${pgm})" /tmp/cobol.insplog
 
-#drm -f "${datasets}"
+# PL/I IVP
+plisrc=iqivpf.pli
+pgm=IQIVPF
+#
+# compile
+#
+copyasciifile "${ZBREW_WORKROOT}/zbrew-eqa/eqae20/${plisrc}" "${src}(${pgm})"
+rc=$?
+if [ $rc -gt 0 ]; then
+        cleanup "IVP: Copy of PL/I source failed with rc: $rc. Source Dataset retained" "${src}" "${pgm}PL"
+fi
+
+export steplib="${ZBREW_PLIHLQ}.SIBMZCMP:${ZBREW_CEEHLQ}.SCEERUN"
+export args="TEST(ALL,SYM,NOHOOK) NEST SYSTEM(MVS) NTERM STG S OP XREF NOPT INSOURCE"
+export sysplin="${obj}(${pgm}PL)"
+mvscmd --pgm=IBMZPLI --args="${args}" --syslin="${sysplin}" --sysprint="${list}(${pgm}PL)" --sysin="${src}(${pgm})"
+rc=$?
+if [ $rc -gt 0 ]; then
+	cleanup "IVP: PL/I compile failed with rc: $rc. Listing retained" "${list}" "${pgm}PL"
+fi
+
+export steplib="${ZBREW_CEEHLQ}.SCEERUN"
+export sysmsgs="${ZBREW_CEEHLQ}.SCEEMSGP(EDCPMSGE)"
+export sysmod="${obj}(${pgm})"
+export plprint="${list}(${pgm}P)"
+mvscmd --pgm=EDCPRLK --args='NOMAP' --steplib="${steplib}" --sysout=dummy --syslib=dummy --sysdefsd=dummy --sysmsgs="${sysmsgs}" --sysin="${sysplin}" --sysmod="${sysmod}" --sysprint="${plprint}" 
+rc=$?
+if [ $rc -gt 4 ]; then
+	cleanup "IVP: PL/I prelink failed with rc: $rc. Listing retained" "${list}" "${pgm}P"
+fi
+
+#
+# link
+#
+export syslib="${ZBREW_CEEHLQ}.SCEELKED"
+mvscmd --pgm=IEWBLINK --args="MAP" --object="${obj}(${pgm})" --syslib="${syslib}" --sysprint="${list}(${pgm}MP)" --syslmod="${lib}(${pgm})" --syslin="${sysmod}"
+rc=$?
+if [ $rc -gt 0 ]; then
+	cleanup "IVP: COBOL link failed with rc: $rc. Listing retained" "${list}" "${pgm}MP"
+fi
+
+#
+# go
+#
+plicmdsrc="iqivpf.cmd"
+copyasciifile "${ZBREW_WORKROOT}/zbrew-eqa/eqae20/${plicmdsrc}" "${dbgcmd}(${pgm})"
+rc=$?
+if [ $rc -gt 0 ]; then
+	cleanup "IVP: Copy of PL/I debug command file failed with rc: $rc. Command file retained" "${dbgcmd}" "${pgm}"
+fi
+
+export steplib="${lib}:${ZBREW_TGT_HLQ}EQAE20.SEQAMOD:${ZBREW_CEEHLQ}.SCEERUN"
+mvscmd --pgm="${pgm}" --args='TEST(ALL,INSPIN,PROMPT,*)/' --steplib="${steplib}" --inspin="${dbgcmd}(${pgm})" --insplog="${insplog}(${pgm})" --sysout="${sysout}(${pgm})" --sysprint="${sysprint}(${pgm})"
+rc=$?
+if [ $rc -gt 0 ]; then
+	cleanup "IVP: PL/I Run failed with rc: $rc. SYSOUT retained" "${sysout}" "${pgm}"
+fi
+dcp "${insplog}(${pgm})" /tmp/pli.insplog
+
+drm -f "${datasets}"
 exit 0
