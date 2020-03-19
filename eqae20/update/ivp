@@ -90,7 +90,7 @@ ivppli() {
 	#
 	# compile
 	#
-	copyasciifile "${ZBREW_WORKROOT}/zbrew-eqa/eqae20/${plisrc}" "${src}(${pgm})"
+	copyasciifile "${srcroot}${plisrc}" "${src}(${pgm})"
 	rc=$?
 	if [ $rc -gt 0 ]; then
 		cleanup "IVP: Copy of PL/I source failed with rc: $rc. Source Dataset retained" "${src}" "${pgm}PL"
@@ -129,7 +129,7 @@ ivppli() {
 	# go
 	#
 	plicmdsrc="iqivpf.cmd"
-	copyasciifile "${ZBREW_WORKROOT}/zbrew-eqa/eqae20/${plicmdsrc}" "${dbgcmd}(${pgm})"
+	copyasciifile "${srcroot}${plicmdsrc}" "${dbgcmd}(${pgm})"
 	rc=$?
 	if [ $rc -gt 0 ]; then
 		cleanup "IVP: Copy of PL/I debug command file failed with rc: $rc. Command file retained" "${dbgcmd}" "${pgm}"
@@ -152,7 +152,7 @@ ivpcobol() {
 	#
 	# compile
 	#
-	copyasciifile "${ZBREW_WORKROOT}/zbrew-eqa/eqae20/${cobsrc}" "${src}(${pgm})"
+	copyasciifile "${srcroot}${cobsrc}" "${src}(${pgm})"
 	rc=$?
 	if [ $rc -gt 0 ]; then
 		cleanup "IVP: Copy of COBOL source failed with rc: $rc. Source Dataset retained" "${src}" "${pgm}"
@@ -188,7 +188,7 @@ zz
 	# go
 	#
 	cobcmdsrc="progt.cmd"
-	copyasciifile "${ZBREW_WORKROOT}/zbrew-eqa/eqae20/${cobcmdsrc}" "${dbgcmd}(${pgm})"
+	copyasciifile "${srcroot}${cobcmdsrc}" "${dbgcmd}(${pgm})"
 	rc=$?
 	if [ $rc -gt 0 ]; then
 		cleanup "IVP: Copy of COBOL debug command file failed with rc: $rc. Command file retained" "${dbgcmd}" "${pgm}"
@@ -216,7 +216,7 @@ ivpasm() {
 	#
 	# assemble
 	#
-	copyasciifile "${ZBREW_WORKROOT}/zbrew-eqa/eqae20/${asmsrc}" "${src}(${pgm})"
+	copyasciifile "${srcroot}${asmsrc}" "${src}(${pgm})"
 	rc=$?
 	if [ $rc -gt 0 ]; then
 		cleanup "IVP: Copy of assembler source failed with rc: $rc. Source Dataset retained" "${src}" "${pgm}"
@@ -254,7 +254,7 @@ zz
 	# Run assembler code under debugger
 	#
 	asmcmdsrc=dtivpa.cmd
-	copyasciifile "${ZBREW_WORKROOT}/zbrew-eqa/eqae20/${asmcmdsrc}" "${dbgcmd}(${pgm})"
+	copyasciifile "${srcroot}${asmcmdsrc}" "${dbgcmd}(${pgm})"
 	rc=$?
 	if [ $rc -gt 0 ]; then
 		cleanup "IVP: Copy of assembler debug command file failed with rc: $rc. Command file retained" "${dbgcmd}" "${pgm}"
@@ -275,6 +275,8 @@ zz
 #
 #set -x
 createdatasets
+
+srcroot="${ZBREW_WORKROOT}/zbrew-eqa/eqae20/update/src/"
 
 zbrewswinstalled asm
 if [ $? -gt 0 ]; then

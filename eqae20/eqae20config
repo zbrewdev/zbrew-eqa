@@ -15,15 +15,15 @@ if [ $rc -gt 0 ]; then
 	exit $rc
 fi
 
-${mydir}/eqae20configregistration ENABLE ${regScript}
+${mydir}/generate/registration ENABLE ${regScript}
 if [ $? -gt 0 ]; then
 	exit $?
 fi
-${mydir}/eqae20configapfauthorization ENABLE ${apfAuthScript}
+${mydir}/generate/apfauthorization ENABLE ${apfAuthScript}
 if [ $? -gt 0 ]; then
 	exit $?
 fi
-${mydir}/eqae20configivp ${ivpScript}
+${mydir}/generate/ivp ${ivpScript}
 if [ $? -gt 0 ]; then
 	exit $?
 fi
