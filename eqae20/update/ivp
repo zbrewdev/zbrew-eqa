@@ -52,6 +52,7 @@ createdatasets() {
 	adata=`mvstmp ${ZBREW_TGT_HLQ}IVPADA`
 	obj=`mvstmp ${ZBREW_TGT_HLQ}IVPOBJ`
 	langx=`mvstmp ${ZBREW_TGT_HLQ}IVPLGX`
+	cdbg=`mvstmp ${ZBREW_TGT_HLQ}IVPCDBG`
 	mod=`mvstmp ${ZBREW_TGT_HLQ}IVPMOD`
 	lib=`mvstmp ${ZBREW_TGT_HLQ}IVPLIB`
 	insplog=`mvstmp ${ZBREW_TGT_HLQ}IVPLOG`
@@ -60,11 +61,12 @@ createdatasets() {
 	sysout=`mvstmp ${ZBREW_TGT_HLQ}IVPOUT`
 	dbgcmd=`mvstmp ${ZBREW_TGT_HLQ}IVPCMD`
 
-	datasets="${src} ${list} ${fblist} ${pmap} ${adata} ${obj} ${langx} ${mod} ${lib} ${insplog} ${sysprint} ${sysout} ${dbgcmd}"
+	datasets="${src} ${list} ${fblist} ${pmap} ${adata} ${obj} ${langx} ${cdbg} ${mod} ${lib} ${insplog} ${sysprint} ${sysout} ${dbgcmd}"
 
 	dtouch -tpdse ${src}
 	dtouch -tpds -l1562 -rvb -s1m ${langx}
 	dtouch -tpdse ${obj}
+	dtouch -tpdse ${cdbg}
 	dtouch -tpds -ru ${mod}
 	dtouch -tpdse -ru ${lib}
 	dtouch -tpdse -rvb -l32756 ${adata}
@@ -145,7 +147,7 @@ ivppli() {
 }
 
 ivpcobol() {
-#	set +x
+#	set -x
 	# COBOL IVP
 	cobsrc=progt.cobol
 	pgm=PROGT
@@ -203,6 +205,55 @@ zz
 
 	# msf - need to check the INSPLOG file (right now it is unable to load EQALANGX)
 	dcp "${insplog}(${pgm})" /tmp/cobol.insplog
+}
+
+ivpc() {
+#	set -x
+	#
+	# C IVP
+	#
+
+	pgm=EQAWCINM
+
+	opts='/xplink goff noopt,source,debug(format(dwarf),hook(line,noblock,path),symbol),xplink,rent'
+	steplib="${ZBREW_CEEHLQ}.SCEERUN2:${ZBREW_CBCHLQ}.SCCNCMP:${ZBREW_CEEHLQ}.SCEERUN"
+	syslib="${ZBREW_CEEHLQ}.SCEEH.H:${ZBREW_CEEHLQ}.SCEEH.SYS.H"
+	mvscmd --pgm=CCNDRVR --args="${opts}" --steplib="${steplib}" --syslin="${obj}(${pgm})" --syscdbg="${cdbg}(${pgm})" --syslib="${syslib}" --sysin="${ZBREW_SRC_HLQ}EQAE20.SEQASAMP(${pgm})" --sysout=* --sysprint=*
+	rc=$?
+	if [ $rc -gt 0 ]; then
+		cleanup "IVP: Compile failed with rc: $rc. Listing retained" "${list}" "${pgm}"
+	fi
+
+	#
+	# Bind C code 
+	#
+	opts='AMODE=31,MAP,RENT,DYNAM=DLL,CASE=MIXED,LIST=NOIMP'
+	steplib="${ZBREW_CEEHLQ}.SCEERUN2:${ZBREW_CEEHLQ}.SCEERUN"
+	syslin="${obj}(${pgm}):${ZBREW_CEEHLQ}.SCEELIB(CELHS003):${ZBREW_CEEHLQ}.SCEELIB(CELHS001)"
+	mvscmd --pgm=IEWL --args="${opts}" --steplib="${steplib}" --syslib=${ZBREW_CEEHLQ}.SCEEBND2 --object=${obj} --syslmod="${lib}(${pgm})" --sysprint="${list}(${pgm})" --syslin="${syslin}" --sysdefsd=dummy 
+	rc=$?
+	if [ $rc -gt 0 ]; then
+		cleanup "IVP: C Bind failed with rc: $rc. Listing retained" "${list}" "${pgm}"
+	fi
+
+	#
+	# Run C code under debugger
+	#
+	ccmdsrc=eqawcinm.cmd
+	copyasciifile "${srcroot}${ccmdsrc}" "${dbgcmd}(${pgm})"
+	rc=$?
+	if [ $rc -gt 0 ]; then
+		cleanup "IVP: Copy of C debug command file failed with rc: $rc. Command file retained" "${dbgcmd}" "${pgm}"
+	fi
+	steplib="${lib}:${ZBREW_TGT_HLQ}EQAE20.SEQAMOD:${ZBREW_CEEHLQ}.SCEERUN"
+	runargs="test(,CMDS,;,*) trap(on)/"
+	mvscmd --pgm=${pgm} --args="${runargs}" --steplib="${steplib}" --insplog="${insplog}(${pgm})" --cmds="${dbgcmd}(${pgm})" --sysout="${sysout}(${pgm})" 
+
+	rc=$?
+	if [ $rc -gt 0 ]; then
+		cleanup "IVP: C Run failed with rc: $rc. Listing retained" "${list}" "${pgm}"
+	fi
+	dcp "${insplog}(${pgm})" /tmp/c.insplog
 }
 
 ivpasm() {
@@ -286,6 +337,16 @@ if [ $? -gt 0 ]; then
 	fi
 else 
 	echo "Assembler IVP skipped."
+fi
+
+zbrewswinstalled cbc
+if [ $? -gt 0 ]; then
+	ivpc
+	if [ $? -gt 0 ]; then
+		exit $?
+	fi
+else 
+	echo "C IVP skipped."
 fi
 
 zbrewswinstalled igy

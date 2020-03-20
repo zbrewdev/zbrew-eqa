@@ -1,14 +1,26 @@
 #!/bin/sh
 
-if ! [ $# -eq 1 ]; then
-	echo "Syntax: ivp <output-script>" >&2
+if ! [ $# -eq 2 ]; then
+	echo "Syntax: ivp ENABLE|DISABLE <output-script>" >&2
 	exit 8
 fi
-script="$1"
+verb="$1"
+script="$2"
 
 zbrew=`whence zbrew`
 zbrewdir=${zbrew%/*} 
 zbrewroot=${zbrewdir%/*}
+
+if [ "${verb}" = "DISABLE" ]; then
+	cat << EOF >${script}
+#!/bin/sh
+# No code required to 'undo' IVP
+exit 0
+EOF
+	exit 0
+fi
+
+# ENABLE
 
 cat << EOF >${script}
 #!/bin/sh
