@@ -2,11 +2,15 @@
 #
 # This should get pulled into the BOM for EQAE20 and general configure from zbrew
 #
-
 if ! [ $# -eq 2 ]; then
 	echo "Syntax: configregistration ENABLE|DISABLE <output-script>" >&2
 	exit 8
 fi
+if [ -z "${PRODUCT_CODE}" ]; then
+	echo "configregistration requires a productcode, which should be specified in the JSON ORDER for EQAE20" >&2
+	exit 8
+fi
+
 verb="$1"
 script="$2"
 zbrew=`whence zbrew`
@@ -16,18 +20,20 @@ zbrewroot=${zbrewdir%/*}
 cat << EOF >${script}
 #!/bin/sh
 #set -x
+export PRODUCT_CODE="${PRODUCT_CODE}"
+export PRODUCT_NAME="${PRODUCT_NAME}"
+export FEATURE_NAME="${FEATURE_NAME}"
 export PATH=${zbrewdir}:\$PATH
 . zbrewsetenv
 
-id="5737-I22"
 enablementText="PRODUCT OWNER('IBM CORP')
-	NAME('IBM Z OPEN DEV')
-	ID(\${id})
+	NAME('\${PRODUCT_NAME}')
+	ID(\${PRODUCT_CODE})
 	VERSION(*) RELEASE(*) MOD(*)
-	FEATURENAME('IDz-DEBUGGER')
+	FEATURENAME('\${FEATURE_NAME}')
 	STATE(ENABLED)"
 
-swregistrar "eqae20" "${verb}" "\${id}" "\${enablementText}"
+swregistrar "eqae20" "${verb}" "\${PRODUCT_CODE}" "\${enablementText}"
 EOF
 
 if [ $? -gt 0 ]; then

@@ -1,11 +1,8 @@
 #!/bin/sh
-
+#set -x
 . zbrewsetenv
 
 eqaRoot="${ZBREW_WORKROOT}/deconfig/eqae20"
-apfAuthScript="${eqaRoot}/1_apfauth.sh"
-regScript="${eqaRoot}/2_swregister.sh"
-
 mkdir -p "${eqaRoot}"
 rc=$?
 if [ $rc -gt 0 ]; then
@@ -13,13 +10,16 @@ if [ $rc -gt 0 ]; then
 	exit $rc
 fi
 
-${mydir}/eqae20configregistration DISABLE ${regScript}
-if [ $? -gt 0 ]; then
-	exit $?
-fi
-${mydir}/eqae20configapfauthorization DISABLE ${apfAuthScript}
-if [ $? -gt 0 ]; then
-	exit $?
-fi
+cd "${mydir}/generate"
+steps=`echo *`
+reversesteps=`echo "${steps}" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }'`
+cd $OLDPWD
+for step in ${reversesteps}; do
+	script="${eqaRoot}/${step}.sh"
+	"${mydir}/generate/${step}" DISABLE "${script}"
+	if [ $? -gt 0 ]; then
+		exit $?
+	fi
+done
 
 exit 0

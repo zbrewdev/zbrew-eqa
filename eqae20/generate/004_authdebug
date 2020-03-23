@@ -1,0 +1,86 @@
+#!/bin/sh
+
+if ! [ $# -eq 2 ]; then
+	echo "Syntax: authdebug ENABLE|DISABLE <output-script>" >&2
+	exit 8
+fi
+verb="$1"
+script="$2"
+
+zbrew=`whence zbrew`
+zbrewdir=${zbrew%/*} 
+zbrewroot=${zbrewdir%/*}
+
+if [ "${verb}" = "DISABLE" ]; then
+	cat << EOF >${script}
+#!/bin/sh
+tsocmd "RDELETE FACILITY EQADTOOL.AUTHDEBUG" >/dev/null 2>&1
+exit $?
+EOF
+	chmod u+x "${script}"
+	exit 0
+fi
+
+#
+# ENABLE
+#
+cat << EOF >${script}
+#!/bin/sh
+#set -x
+
+issueTSO() {
+	cmd=\$1
+	tmpout="\${ZBREW_TMP}/\$\$tso.out"
+	tsocmd "\${cmd}" >\$tmpout 2>/dev/null
+	rc=\$?
+	if [ \$rc -gt 0 ]; then
+		cat "\${tmpout}" >&2  
+	fi
+	rm -f "\${tmpout}"
+	return \$rc
+}
+
+chk() {
+	rc=\$1
+	msg="\$2"
+
+	if  [ \$rc -eq 0 ]; then
+		return 0
+	fi
+	echo "\${msg}" >&2
+	exit \$rc
+}
+
+export PATH=${zbrewdir}:\$PATH
+. zbrewsetenv eqae20
+
+if [ "\${EQAE20_AUTHDEBUG_USERS}" != "NONE" ] && [ "\${EQAE20_AUTHDEBUG_USERS}" != "" ]; then
+	tsocmd "RDELETE FACILITY EQADTOOL.AUTHDEBUG" >/dev/null 2>/dev/null
+
+	issueTSO "RDEFINE FACILITY EQADTOOL.AUTHDEBUG UACC(NONE)"
+	chk "\$?" "Unable to define EQADTOOL.AUTHDEBUG facility to RACF"
+
+	issueTSO "SETROPTS GENERIC(FACILITY)"
+	chk "\$?" "Unable to set generic profile checking"
+
+	for user in \${EQAE20_AUTHDEBUG_USERS}; do
+		issueTSO "PERMIT EQADTOOL.AUTHDEBUG CLASS(FACILITY) ID(\${user})"
+		chk "\$?" "Unable to authorize user \${user} to EQADTOOL.AUTHDEBUG CLASS(FACILITY)"
+	done
+	issueTSO "SETROPTS CLASSACT(FACILITY)"
+	chk "\$?" "Unable to activate FACILITY class"
+
+	issueTSO "RLIST FACILITY EQADTOOL.AUTHDEBUG" >/dev/null
+	chk "\$?" "Unable to REFRESH facility list"
+fi
+
+exit \$?
+EOF
+
+if [ $? -gt 0 ]; then
+	echo "Unable to create EQAE20 Update script: ${script}." >&2
+	exit 16
+fi
+
+chmod u+x "${script}"
+exit 0

@@ -1,13 +1,8 @@
 #!/bin/sh
-# Need to perform product enablement 
-
+#set -x
 . zbrewsetenv
 
 eqaRoot="${ZBREW_WORKROOT}/config/eqae20"
-regScript="${eqaRoot}/1_swregister.sh"
-apfAuthScript="${eqaRoot}/2_apfauth.sh"
-ivpScript="${eqaRoot}/3_ivp.sh"
-
 mkdir -p "${eqaRoot}"
 rc=$?
 if [ $rc -gt 0 ]; then
@@ -15,17 +10,15 @@ if [ $rc -gt 0 ]; then
 	exit $rc
 fi
 
-${mydir}/eqae20configregistration ENABLE ${regScript}
-if [ $? -gt 0 ]; then
-	exit $?
-fi
-${mydir}/eqae20configapfauthorization ENABLE ${apfAuthScript}
-if [ $? -gt 0 ]; then
-	exit $?
-fi
-${mydir}/eqae20configivp ${ivpScript}
-if [ $? -gt 0 ]; then
-	exit $?
-fi
+cd "${mydir}/generate"
+steps=`echo *`
+cd $OLDPWD
+for step in ${steps}; do
+	script="${eqaRoot}/${step}.sh"
+	"${mydir}/generate/${step}" ENABLE "${script}"
+	if [ $? -gt 0 ]; then
+		exit $?
+	fi
+done
 
 exit 0
