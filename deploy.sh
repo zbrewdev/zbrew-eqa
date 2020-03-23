@@ -19,6 +19,9 @@ fi
 
 rm -rf $1/eqae20
 mkdir $1/eqae20
+mkdir $1/eqae20/generate
+mkdir $1/eqae20/update
+mkdir $1/eqae20/update/src
 mkdir $1/eqae20/docs
 mkdir $1/eqae20/docs/C
 mkdir $1/eqae20/docs/C/cat1
