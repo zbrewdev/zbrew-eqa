@@ -4,10 +4,10 @@ eqae20/eqae20bom.json
 eqae20/eqae20req.json
 eqae20/eqae20config
 eqae20/eqae20deconfig
-001_registration
-002_apfauthorization
-003_ivp
-004_authdebug
+eqae20/generate/001_registration
+eqae20/generate/002_apfauthorization
+eqae20/generate/003_ivp
+eqae20/generate/004_authdebug
 eqae20/update/ivp
 eqae20/update/src/dtivpa.as
 eqae20/update/src/dtivpa.cmd
