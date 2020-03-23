@@ -98,7 +98,7 @@ ivppli() {
 		cleanup "IVP: Copy of PL/I source failed with rc: $rc. Source Dataset retained" "${src}" "${pgm}PL"
 	fi
 
-	export steplib="${ZBREW_PLIHLQ}.SIBMZCMP:${ZBREW_CEEHLQ}.SCEERUN"
+	export steplib="${ZBREW_IBMHLQ}.SIBMZCMP:${ZBREW_CEEHLQ}.SCEERUN"
 	export args="TEST(ALL,SYM,NOHOOK) NEST SYSTEM(MVS) NTERM STG S OP XREF NOPT INSOURCE"
 	export sysplin="${obj}(${pgm}PL)"
 	mvscmd --pgm=IBMZPLI --args="${args}" --syslin="${sysplin}" --sysprint="${list}(${pgm}PL)" --sysin="${src}(${pgm})"

@@ -60,15 +60,12 @@ if [ "\${EQAE20_AUTHDEBUG_USERS}" != "NONE" ] && [ "\${EQAE20_AUTHDEBUG_USERS}" 
 	issueTSO "RDEFINE FACILITY EQADTOOL.AUTHDEBUG UACC(NONE)"
 	chk "\$?" "Unable to define EQADTOOL.AUTHDEBUG facility to RACF"
 
-	issueTSO "SETROPTS GENERIC(FACILITY)"
-	chk "\$?" "Unable to set generic profile checking"
-
 	for user in \${EQAE20_AUTHDEBUG_USERS}; do
 		issueTSO "PERMIT EQADTOOL.AUTHDEBUG CLASS(FACILITY) ID(\${user})"
 		chk "\$?" "Unable to authorize user \${user} to EQADTOOL.AUTHDEBUG CLASS(FACILITY)"
 	done
-	issueTSO "SETROPTS CLASSACT(FACILITY)"
-	chk "\$?" "Unable to activate FACILITY class"
+	issueTSO "SETROPTS CLASSACT(FACILITY) REFRESH"
+	chk "\$?" "Unable to refresh FACILITY class"
 
 	issueTSO "RLIST FACILITY EQADTOOL.AUTHDEBUG" >/dev/null
 	chk "\$?" "Unable to REFRESH facility list"
