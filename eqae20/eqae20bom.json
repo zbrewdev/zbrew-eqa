@@ -258,8 +258,8 @@
 				"dstype":"PDSE",
 				"recfm":"FB",
 				"lrecl":"80",
-				"primary":"5",
-				"secondary":"2",
+				"primary":"15",
+				"secondary":"5",
 				"zones":["T"]
 			},
 			{
