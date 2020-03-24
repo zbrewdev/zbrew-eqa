@@ -258,7 +258,7 @@
 				"dstype":"PDSE",
 				"recfm":"FB",
 				"lrecl":"80",
-				"primary":"15",
+				"primary":"25",
 				"secondary":"5",
 				"zones":["T"]
 			},
