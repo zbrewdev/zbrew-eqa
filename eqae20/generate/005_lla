@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if ! [ $# -eq 2 ]; then
-	echo "Syntax: authlla ENABLE|DISABLE <output-script>" >&2
+	echo "Syntax: lla ENABLE|DISABLE <output-script>" >&2
 	exit 8
 fi
 verb="$1"
@@ -19,11 +19,11 @@ export PATH=${zbrewdir}:\$PATH
 . zbrewsetenv eqae20
 . \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
 
-if ! \`supportsMFI "\$PRODUCT_CODE"\`; then
-	# Not applicable for these products
-	exit 0
+datasets="\${ZBREW_TGT_HLQ}EQAE20.SEQAMOD"
+if  \`supportsMFI "\$PRODUCT_CODE"\`; then
+	datasets="\${datasets} \${ZBREW_TGT_HLQ}EQAE20.SEQABMOD"
 fi
-llregistrar eqae20 disable "\${ZBREW_TGT_HLQ}EQAE20.SEQABMOD"
+llregistrar eqae20 disable "\${datasets}"
 
 exit $?
 EOF
@@ -43,13 +43,11 @@ export PATH=${zbrewdir}:\$PATH
 . \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
 export PRODUCT_CODE="${PRODUCT_CODE}"
 
-if ! \`supportsMFI "\$PRODUCT_CODE"\`; then
-	# Not applicable for these products
-	exit 0
+datasets="\${ZBREW_TGT_HLQ}EQAE20.SEQAMOD"
+if  \`supportsMFI "\$PRODUCT_CODE"\`; then
+	datasets="\${datasets} \${ZBREW_TGT_HLQ}EQAE20.SEQABMOD"
 fi
-
-# Module is APF authorized in the APF authorization step
-llregistrar eqae20 enable "\${ZBREW_TGT_HLQ}EQAE20.SEQABMOD"
+llregistrar eqae20 enable "\${datasets}"
 
 exit \$?
 EOF
