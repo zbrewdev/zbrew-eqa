@@ -15,9 +15,16 @@ cat << EOF >${script}
 #!/bin/sh
 #set -x
 export PATH=${zbrewdir}:\$PATH
+export PRODUCT_CODE="${PRODUCT_CODE}"
 . zbrewsetenv
+. \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
 
-apfregistrar eqae20 "${verb}" "\${ZBREW_TGT_HLQ}EQAE20.SEQAAUTH"
+datasets="\${ZBREW_TGT_HLQ}EQAE20.SEQAAUTH"
+if \`supportsMFI "\$PRODUCT_CODE"\`; then
+	datasets="\${datasets} \${ZBREW_TGT_HLQ}EQAE20.SEQABMOD"
+fi
+
+apfregistrar eqae20 "${verb}" "\${datasets}"
 exit $?
 EOF
 
