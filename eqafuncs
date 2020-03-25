@@ -1,0 +1,19 @@
+#
+# This set of functions and variable definitions meant to be SOURCED, e.g. . eqafuncs
+# These are helper functions specific to debug, but applicable to different versions of debug
+#
+export PROD_ADFZ_CODE='5655-AC6'
+export PROD_IDZEE_CODE='5655-AC5'
+export PROD_IDZ_CODE='5724-T07'
+export PROD_ZOD_CODE='5737-I22'
+export PROD_ZOUT_CODE='5737-J31'
+export PROD_DT_CODE='5655-Q50'
+
+supportsMFI() {
+	code="$1"
+	if [ "$code" = "$PROD_ZOD_CODE" ] || [ "$code" = "$PROD_ZOUT_CODE" ]; then
+		echo false
+	else
+		echo true
+	fi
+}
