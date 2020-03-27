@@ -17,3 +17,8 @@ supportsMFI() {
 		echo true
 	fi
 }
+
+supportsDebugManager() {
+	code="$1"
+	echo true
+}

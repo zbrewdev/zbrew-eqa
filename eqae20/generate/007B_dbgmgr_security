@@ -1,0 +1,65 @@
+#!/bin/sh
+#set -x
+
+if ! [ $# -eq 2 ]; then
+	echo "Syntax: dbgmgr_security ENABLE|DISABLE <output-script>" >&2
+	exit 8
+fi
+verb="$1"
+script="$2"
+
+zbrew=`whence zbrew`
+zbrewdir=${zbrew%/*} 
+zbrewroot=${zbrewdir%/*}
+
+cat << EOF >${script}
+#!/bin/sh
+export PATH=${zbrewdir}:\$PATH
+. zbrewsetswenv eqae20
+. \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
+export PRODUCT_CODE="$PRODUCT_CODE"
+
+if ! \`supportsDebugManager "\$PRODUCT_CODE"\`; then
+	exit 0
+fi
+
+if \`undefinedProperty "\${EQAE20_DBGMGR_CLIENT}"\` ; then
+	echo "dbgmgr_security: EQAE20_DBGMGR_CLIENT must be specified" >&2
+	exit 4
+fi
+if \`undefinedProperty "\${EQAE20_DBGMGR_HOST}"\` ; then
+	echo "dbgmgr_security: EQAE20_DBGMGR_HOST must be specified" >&2
+	exit 4
+fi
+
+ttlsrule="
+TTLSRule zOS_Debugger_Debug_Manager  
+{
+  LocalPortRange      \${EQAE20_DBGMGR_CLIENT}
+  Direction           Inbound
+  TTLSGroupActionRef  act_zOS_Debugger_Debug_Manager
+}
+TTLSEnvironmentAction  act_zOS_Debugger_Debug_Manager
+{
+  HandshakeRole Server
+  TTLSKeyRingParms
+  {
+    Keyring dbgmgr_security.racf # Keyring must be owned by the Debug Manager
+  }
+}
+TTLSGroupAction grp_Production
+{
+  TTLSEnabled On
+  Trace       2
+}"
+
+echo "\$ttlsrule"
+EOF
+
+if [ $? -gt 0 ]; then
+	echo "Unable to create EQAE20 Update script: ${script}." >&2
+	exit 16
+fi
+
+chmod u+x "${script}"
+exit 0

@@ -2,7 +2,10 @@
  	"software": [{
 		"name":"EQAE20",
 		"config":{
-			"EQAE20_AUTHDEBUG_USERS":"NONE"
+			"EQAE20_AUTHDEBUG_USERS":"NONE",
+			"EQAE20_TZ_OVERRIDE":"NONE",
+			"EQAE20_DBGMGR_CLIENT":"5335",
+			"EQAE20_DBGMGR_HOST":"5336"
                  }
 	}]
 }

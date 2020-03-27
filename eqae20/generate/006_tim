@@ -1,0 +1,34 @@
+#!/bin/sh
+
+if ! [ $# -eq 2 ]; then
+	echo "Syntax: tim ENABLE|DISABLE <output-script>" >&2
+	exit 8
+fi
+verb="$1"
+script="$2"
+
+zbrew=`whence zbrew`
+zbrewdir=${zbrew%/*} 
+zbrewroot=${zbrewdir%/*}
+
+cat << EOF >${script}
+#!/bin/sh
+export PATH=${zbrewdir}:\$PATH
+. zbrewsetenv eqae20
+. $ZBREW_WORKROOT/zbrew-eqa/eqafuncs
+export PRODUCT_CODE="$PRODUCT_CODE"
+
+if \`supportsMFI "\$PRODUCT_CODE"\`; then
+	echo "MFI Configuration tbd" >&2
+	exit 16
+fi
+exit 0
+EOF
+
+if [ $? -gt 0 ]; then
+	echo "Unable to create EQAE20 Update script: ${script}." >&2
+	exit 16
+fi
+
+chmod u+x "${script}"
+exit 0
