@@ -22,9 +22,37 @@ export PRODUCT_CODE="$PRODUCT_CODE"
 if ! \`supportsDebugManager "\$PRODUCT_CODE"\`; then
 	exit 0
 fi
+sp=\`securityProduct\`
+if [ "\${sp}" != "RACF" ]; then
+	echo "Security product support for \${sp} not implemented yet" >&2
+	exit 16
+fi
+
+EOF
+
+if [ $? -gt 0 ]; then
+	echo "Unable to create EQAE20 Update script: ${script}." >&2
+	exit 16
+fi
+
+chmod u+x "${script}"
+
+if [ "${verb}" = "DISABLE" ]; then
+	cat << EOF >>${script}
+
+	tsocmd "PERMIT BPX.SERVER CLASS(FACILITY) DELETE ID(STCDBM)" >/dev/null 2>/dev/null
+	tsocmd "RDELETE STARTED DBGMGR.*" >/dev/null 2>&1
+	tsocmd "DELUSER STCDBM" >/dev/null 2>&1
+	issueTSO "SETROPTS RACLIST(FACILITY) REFRESH"
+	chk "\$?" "Unable to refresh facility task class"
+	exit 0
+EOF
+
+else 
+	cat << EOF >>${script}
 	issueTSO "SETROPTS GENERIC(FACILITY)"
 	chk "\$?" "Unable to set generic(facility)"
-	
+
 	issueTSO "SETROPTS CLASSACT(FACILITY) RACLIST(FACILITY)"
 	chk "\$?" "Unable to set classact(facility)"
 
@@ -59,19 +87,16 @@ fi
 		issueTSO "RDEFINE FACILITY BPX.SERVER UACC(NONE)"
 		chk "\$?" "Unable to define profile BPX.SERVER"
 	fi
-	
+
 	tsocmd "PERMIT BPX.SERVER CLASS(FACILITY) DELETE ID(STCDBM)" >/dev/null 2>/dev/null
 	issueTSO "PERMIT BPX.SERVER CLASS(FACILITY) ACCESS(UPDATE) ID(STCDBM)"
 	chk "\$?" "Unable to refresh started task class"
-	
+
 	issueTSO "SETROPTS RACLIST(FACILITY) REFRESH"
 	chk "\$?" "Unable to refresh facility task class"
-EOF
 
-if [ $? -gt 0 ]; then
-	echo "Unable to create EQAE20 Update script: ${script}." >&2
-	exit 16
+	exit 0
+EOF
 fi
 
-chmod u+x "${script}"
 exit 0

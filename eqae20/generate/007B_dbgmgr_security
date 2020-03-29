@@ -22,38 +22,6 @@ export PRODUCT_CODE="$PRODUCT_CODE"
 if ! \`supportsDebugManager "\$PRODUCT_CODE"\`; then
 	exit 0
 fi
-
-if \`undefinedProperty "\${EQAE20_DBGMGR_CLIENT}"\` ; then
-	echo "dbgmgr_security: EQAE20_DBGMGR_CLIENT must be specified" >&2
-	exit 4
-fi
-if \`undefinedProperty "\${EQAE20_DBGMGR_HOST}"\` ; then
-	echo "dbgmgr_security: EQAE20_DBGMGR_HOST must be specified" >&2
-	exit 4
-fi
-
-ttlsrule="
-TTLSRule zOS_Debugger_Debug_Manager  
-{
-  LocalPortRange      \${EQAE20_DBGMGR_CLIENT}
-  Direction           Inbound
-  TTLSGroupActionRef  act_zOS_Debugger_Debug_Manager
-}
-TTLSEnvironmentAction  act_zOS_Debugger_Debug_Manager
-{
-  HandshakeRole Server
-  TTLSKeyRingParms
-  {
-    Keyring dbgmgr_security.racf # Keyring must be owned by the Debug Manager
-  }
-}
-TTLSGroupAction grp_Production
-{
-  TTLSEnabled On
-  Trace       2
-}"
-
-echo "\$ttlsrule"
 EOF
 
 if [ $? -gt 0 ]; then
@@ -62,4 +30,47 @@ if [ $? -gt 0 ]; then
 fi
 
 chmod u+x "${script}"
+
+if [ "${verb}" = "DISABLE" ]; then
+cat << EOF >>${script}
+	#MSF TBD
+EOF
+
+else
+cat << EOF >>${script}
+	if \`undefinedProperty "\${EQAE20_DBGMGR_CLIENT}"\` ; then
+		echo "dbgmgr_security: EQAE20_DBGMGR_CLIENT must be specified" >&2
+		exit 4
+	fi
+	if \`undefinedProperty "\${EQAE20_DBGMGR_HOST}"\` ; then
+		echo "dbgmgr_security: EQAE20_DBGMGR_HOST must be specified" >&2
+		exit 4
+	fi
+
+	ttlsrule="
+	TTLSRule zOS_Debugger_Debug_Manager  
+	{
+	  LocalPortRange      \${EQAE20_DBGMGR_CLIENT}
+	  Direction           Inbound
+	  TTLSGroupActionRef  act_zOS_Debugger_Debug_Manager
+	}
+	TTLSEnvironmentAction  act_zOS_Debugger_Debug_Manager
+	{
+	  HandshakeRole Server
+	  TTLSKeyRingParms
+	  {
+	    Keyring dbgmgr_security.racf # Keyring must be owned by the Debug Manager
+	  }
+	}
+	TTLSGroupAction grp_Production
+	{
+	  TTLSEnabled On
+	  Trace       2
+	}"
+
+	echo "\$ttlsrule"
+	exit 0
+EOF
+fi
+
 exit 0
