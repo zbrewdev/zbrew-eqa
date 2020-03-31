@@ -64,7 +64,7 @@ createdatasets() {
 	datasets="${src} ${list} ${fblist} ${pmap} ${adata} ${obj} ${langx} ${cdbg} ${mod} ${lib} ${insplog} ${sysprint} ${sysout} ${dbgcmd}"
 
 	dtouch -tpdse ${src}
-	dtouch -tpds -l1562 -rvb -s1m ${langx}
+	dtouch -tseq -l1562 -rvb -s5m ${langx}
 	dtouch -tpdse ${obj}
 	dtouch -tpdse ${cdbg}
 	dtouch -tpds -ru ${mod}
@@ -203,7 +203,6 @@ zz
 		cleanup "IVP: COBOL Run failed with rc: $rc. Listing retained" "${list}" "${pgm}G"
 	fi
 
-	# msf - need to check the INSPLOG file (right now it is unable to load EQALANGX)
 	dcp "${insplog}(${pgm})" /tmp/cobol.insplog
 }
 
@@ -283,7 +282,7 @@ ivpasm() {
 	# Extract Debug Data into EQALANGX format
 	#
 	steplib="${ZBREW_TGT_HLQ}EQAE20.SIPVMODA:${ZBREW_CEEHLQ}.SCEERUN"
-	mvscmd --pgm=EQALANGX --args='(ASM ERROR' --steplib="${steplib}" --sysadata="${adata}(${pgm})" --idilangx="${langx}(${pgm})" --sysprint="${sysprint}(${pgm}LG)"
+	mvscmd --pgm=EQALANGX --args='(ASM ERROR' --steplib="${steplib}" --sysadata="${adata}(${pgm})" --idilangx="${langx}" --sysprint="${sysprint}(${pgm}LG)"
 	rc=$?
 	if [ $rc -gt 0 ]; then
 		cleanup "IVP: EQALANGX failed with rc: $rc. $rc. SYSADATA retained" "${adata}" "${pgm}"
@@ -312,10 +311,11 @@ zz
 	fi
 	steplib="${mod}:${ZBREW_TGT_HLQ}EQAE20.SEQAMOD:${ZBREW_CEEHLQ}.SCEERUN"
 	runargs="TEST(ERROR,INSPIN,,*)/"
-	mvscmd --pgm=DTIVPA --args="${runargs}" --steplib="${steplib}" --eqalangx="${langx}(${pgm})" --insplog="${insplog}(${pgm})" --inspin="${dbgcmd}(${pgm})" --sysout="${sysout}(${pgm}G)" 
+	mvscmd --pgm=DTIVPA --args="${runargs}" --steplib="${steplib}" --eqalangx="${langx}" --insplog="${insplog}(${pgm})" --inspin="${dbgcmd}(${pgm})" --sysout="${sysout}(${pgm}G)" 2>/dev/null 
 
 	rc=$?
-	if [ $rc -gt 0 ]; then
+	# MSF - for now treat things as 'ok' if it's an RC 8 because mvscmd is complaining when it can not free the (already freed?) ddname EQALANGX
+	if [ $rc -gt 8 ]; then
 		cleanup "IVP: Run failed with rc: $rc. Listing retained" "${list}" "${pgm}G"
 	fi
 	dcp "${insplog}(${pgm})" /tmp/asm.insplog
