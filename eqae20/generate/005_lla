@@ -16,7 +16,7 @@ if [ "${verb}" = "DISABLE" ]; then
 #!/bin/sh
 export PRODUCT_CODE="${PRODUCT_CODE}"
 export PATH=${zbrewdir}:\$PATH
-. zbrewsetenv eqae20
+. zbrewsetswenv eqae20
 . \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
 
 datasets="\${ZBREW_TGT_HLQ}EQAE20.SEQAMOD"
@@ -39,7 +39,7 @@ cat << EOF >${script}
 #set -x
 
 export PATH=${zbrewdir}:\$PATH
-. zbrewsetenv eqae20
+. zbrewswsetenv eqae20
 . \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
 export PRODUCT_CODE="${PRODUCT_CODE}"
 
