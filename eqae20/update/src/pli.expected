@@ -1,0 +1,48 @@
+/* IBM z/OS Debugger Version 14 Release 2 Mod 0                       */
+^.*$
+^.*$
+/* The operating system has generated the following message:          */
+/*    EQA2458I SVC Screening is disabled by EQAOPTS. Handling of      */
+/* non-LE events is not available.  Debugging of non-LE programs will */
+/*  be restricted in this z/OS Debugger session.                      */
+/*                                                                    */
+/* *** Commands file commands follow ***                              */
+ COMMENT SHOW BUILD DATE/TIME AND SERVICE LEVEL (IF ANY) ;
+ CALL %VER ;
+/* IBM z/OS Debugger Version 14 Release 2 Mod 0                       */
+^.*$
+^.*$
+ QUERY DYNDEBUG ;
+/* The setting of DYNDEBUG is ON                                      */
+ STEP ;
+ LIST ( 'Test case started' ) ;
+/* 'Test case started'                                                */
+ AT 3 ;
+ GO ;
+ QUERY LOCATION ;
+/* You are executing commands in the STATEMENT IQIVPF ::> IQIVPF :> 3 */
+/*  breakpoint.                                                       */
+/* The current location is IQIVPF ::> IQIVPF :> 3.                    */
+ AT 6
+   DO ;
+     LIST I ;
+     GO ;
+   END ;
+ AT 8 ;
+ DCL TEMP FIXED DECIMAL ;
+ AT OCCURRENCE ERROR
+   DO ;
+     LIST ( 'ERROR CONDITION REACHED UNEXPECTEDLY' ) ;
+     QUIT ;
+   END ;
+ LIST NAMES TEST ;
+/* The following session names are known                              */
+/*   TEMP                                                             */
+ GO ;
+/* I =        1                                                       */
+/* I =        2                                                       */
+ QUERY LOCATION ;
+/* You are executing commands in the STATEMENT IQIVPF ::> IQIVPF :> 8 */
+/*  breakpoint.                                                       */
+/* The current location is IQIVPF ::> IQIVPF :> 8.                    */
+/*  QUIT DEBUG ;                                                      */

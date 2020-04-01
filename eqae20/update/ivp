@@ -1,6 +1,7 @@
 #!/bin/sh
 
 . zbrewsetenv
+export PATH=$ZBREW_ROOT/testtools:$PATH
 
 copyasciifile() {
 #	set +x
@@ -143,7 +144,9 @@ ivppli() {
 	if [ $rc -gt 0 ]; then
 		cleanup "IVP: PL/I Run failed with rc: $rc. SYSOUT retained" "${sysout}" "${pgm}"
 	fi
-	dcp "${insplog}(${pgm})" /tmp/pli.insplog
+	dcp "${insplog}(${pgm})" /tmp/pli.actual
+	mdiff "${srcroot}/pli.expected" /tmp/pli.actual
+	return $?
 }
 
 ivpcobol() {
@@ -203,7 +206,9 @@ zz
 		cleanup "IVP: COBOL Run failed with rc: $rc. Listing retained" "${list}" "${pgm}G"
 	fi
 
-	dcp "${insplog}(${pgm})" /tmp/cobol.insplog
+	dcp "${insplog}(${pgm})" /tmp/cobol.actual
+	mdiff "${srcroot}/cobol.expected" /tmp/cobol.actual
+	return $?
 }
 
 ivpc() {
@@ -252,7 +257,9 @@ ivpc() {
 	if [ $rc -gt 0 ]; then
 		cleanup "IVP: C Run failed with rc: $rc. Listing retained" "${list}" "${pgm}"
 	fi
-	dcp "${insplog}(${pgm})" /tmp/c.insplog
+	dcp "${insplog}(${pgm})" /tmp/c.actual
+	mdiff "${srcroot}/c.expected" /tmp/c.actual
+	return $?
 }
 
 ivpasm() {
@@ -318,7 +325,9 @@ zz
 	if [ $rc -gt 8 ]; then
 		cleanup "IVP: Run failed with rc: $rc. Listing retained" "${list}" "${pgm}G"
 	fi
-	dcp "${insplog}(${pgm})" /tmp/asm.insplog
+	dcp "${insplog}(${pgm})" /tmp/asm.actual
+	mdiff "${srcroot}/asm.expected" /tmp/asm.actual
+	return $?
 }
 
 # 

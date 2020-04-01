@@ -1,0 +1,37 @@
+/* IBM z/OS Debugger Version 14 Release 2 Mod 0                       */
+^.*$
+^.*$
+/* The operating system has generated the following message:          */
+/*    EQA2458I SVC Screening is disabled by EQAOPTS. Handling of      */
+/* non-LE events is not available.  Debugging of non-LE programs will */
+/*  be restricted in this z/OS Debugger session.                      */
+/*                                                                    */
+/* *** Commands file commands follow ***                              */
+ COMMENT show build date/time and service level (if any) ;
+ CALL %VER ;
+/* IBM z/OS Debugger Version 14 Release 2 Mod 0                       */
+^.*$
+^.*$
+ AT 36
+   LIST ( "At the breakpoint for line", %LINE ) ;
+ GO ;
+/* At the breakpoint for line                                         */
+/* %LINE = "36.1"                                                     */
+ STEP 1 ;
+ LIST var1 ;
+/* var1 = 0                                                           */
+ DESCRIBE ATTRIBUTES var1 ;
+/*   ATTRIBUTES for var1                                              */
+/*     Its address is  205B7F00 and its length is 4                   */
+/*     signed int                                                     */
+ int X ;
+ X = var1 ;
+ X ++ ;
+ LIST X ;
+/* X = 1                                                              */
+ AT EXIT *
+   LIST ( "Exiting ", %CU ) ;
+ GO ;
+/* Exiting                                                            */
+^.*%CU \= .*\.EQAE20\.SEQASAMP\(EQAWCINM\).*$
+/*  QUIT ;                                                            */
