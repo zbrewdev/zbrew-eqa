@@ -68,7 +68,36 @@ cat << EOF >>${script}
 	  Trace       2
 	}"
 
-	echo "\$ttlsrule"
+#	echo "\$ttlsrule"
+
+	# msf - for ADCD, this is where the profile lives export TCPIP_PROFILE="ADCD.Z24A.TCPPARMS(PROF2)"
+
+	ttlsresult=\`opercmd 'd tcpip,,netstat,config' | awk ' /TTLS:/ { print \$2; }'\`
+	pagentresult=\`opercmd 'd tcpip,,netstat,config' | awk ' /PROCNAME: PAGENT/ { print; }'\`
+
+	if ! [ "\${ttlsresult}" = 'YES' ] ; then
+		ttlsentry="TCPCONFIG TTLS           ; Required for AT-TLS
+"
+	else
+		ttlsentry=''
+	fi
+	if [ "\${pagentresult}" = '' ]; then
+		pagententry="AUTOLOG
+  PAGENT                 ; POLICY AGENT, required for AT-TLS
+ENDAUTOLOG"
+	else
+		pagententry=''
+	fi
+	if [ "\${ttlsentry}" != '' ] || [ "\${pagententry}" != '' ]; then
+		text="\${ttlsentry}\${pagententry}"	
+		hdr="; EQAE20 start ;"
+		ftr="; EQAE20 end ;"
+		registrar "EQAE20" "ENABLE" "ZBREW.TCPIP" "PROFILE" "\$hdr" "\$ftr" ";" ";" "\${text}"
+		rc=\$?
+		if [ \$rc -gt 0 ]; then
+			exit \$rc
+		fi
+	fi
 	exit 0
 EOF
 fi
