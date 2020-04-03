@@ -13,31 +13,15 @@ zbrewdir=${zbrew%/*}
 zbrewroot=${zbrewdir%/*}
 
 cat << EOF >${script}
-#!/bin/sh
-export PATH=${zbrewdir}:\$PATH
-. zbrewsetswenv eqae20
-. \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
-export PRODUCT_CODE="$PRODUCT_CODE"
+	#!/bin/sh
+	export PATH=${zbrewdir}:\$PATH
+	. zbrewsetswenv eqae20
+	. \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
+	export PRODUCT_CODE="$PRODUCT_CODE"
 
-if ! \`supportsDebugManager "\$PRODUCT_CODE"\`; then
-	exit 0
-fi
-EOF
-
-if [ $? -gt 0 ]; then
-	echo "Unable to create EQAE20 Update script: ${script}." >&2
-	exit 16
-fi
-
-chmod u+x "${script}"
-
-if [ "${verb}" = "DISABLE" ]; then
-cat << EOF >>${script}
-	#MSF TBD
-EOF
-
-else
-cat << EOF >>${script}
+	if ! \`supportsDebugManager "\$PRODUCT_CODE"\`; then
+		exit 0
+	fi
 	if \`undefinedProperty "\${EQAE20_DBGMGR_CLIENT}"\` ; then
 		echo "dbgmgr_security: EQAE20_DBGMGR_CLIENT must be specified" >&2
 		exit 4
@@ -68,12 +52,8 @@ cat << EOF >>${script}
 	  Trace       2
 	}"
 
-#	echo "\$ttlsrule"
-
-	# msf - for ADCD, this is where the profile lives export TCPIP_PROFILE="ADCD.Z24A.TCPPARMS(PROF2)"
-
-	ttlsresult=\`opercmd 'd tcpip,,netstat,config' | awk ' /TTLS:/ { print \$2; }'\`
-	pagentresult=\`opercmd 'd tcpip,,netstat,config' | awk ' /PROCNAME: PAGENT/ { print; }'\`
+	ttlsresult=\`opercmd 'd tcpip,,netstat,config' 2>/dev/null | awk ' /TTLS:/ { print \$2; }'\`
+	pagentresult=\`opercmd 'd tcpip,,netstat,config' 2>/dev/null | awk ' /PROCNAME: PAGENT/ { print; }'\`
 
 	if ! [ "\${ttlsresult}" = 'YES' ] ; then
 		ttlsentry="TCPCONFIG TTLS           ; Required for AT-TLS
@@ -90,15 +70,54 @@ ENDAUTOLOG"
 	fi
 	if [ "\${ttlsentry}" != '' ] || [ "\${pagententry}" != '' ]; then
 		text="\${ttlsentry}\${pagententry}"	
-		hdr="; EQAE20 start ;"
-		ftr="; EQAE20 end ;"
-		registrar "EQAE20" "ENABLE" "ZBREW.TCPIP" "PROFILE" "\$hdr" "\$ftr" ";" ";" "\${text}"
+		profhdr="; EQAE20 start ;"
+		profftr="; EQAE20 end ;"
+
+		registrar "EQAE20" "${verb}" "ZBREW.TCPIP" "PROFILE" "\$profhdr" "\$profftr" ";" ";" "\${text}"
 		rc=\$?
 		if [ \$rc -gt 0 ]; then
 			exit \$rc
 		fi
 	fi
-	exit 0
+EOF
+
+if [ $? -gt 0 ]; then
+	echo "Unable to create EQAE20 Update script: ${script}." >&2
+	exit 16
+fi
+
+chmod u+x "${script}"
+
+if [ "${verb}" = "ENABLE" ]; then
+	cat << EOF >>${script}
+	procwhence PAGENT >/dev/null 2>&1
+	if [ $? -gt 0 ]; then
+		pagenttask="//PAGENT PROC PRM='-L SYSLOGD' * '' or '-L SYSLOGD'
+//*
+//* TCP/IP POLICY AGENT
+//*
+//*
+//*
+//* default log size: 300,3 (3x 300KB files) (PAGENT_LOG_FILE_CONTROL)
+//*
+//PAGENT EXEC PGM=PAGENT,REGION=0M,TIME=NOLIMIT,
+// PARM='ENVAR(\\\"TZ=EST5DST\\\")/&PRM'
+//SYSPRINT DD SYSOUT=*
+//SYSOUT DD SYSOUT=*
+//*"
+		procregistrar "EQAE20" "${verb}" "PAGENT" "\${pagenttask}"	
+		opercmd "START PAGENT"
+	fi
+	exit \$?
+EOF
+else
+	cat << EOF >>${script}
+	pagentdataset=\`procwhence PAGENT\` 2>&1
+	if [ "\$pagentdataset" = "\${ZBREW_TARGET}.PROCLIB" ]; then
+		opercmd "STOP PAGENT"
+		procregistrar "EQAE20" "${verb}" "PAGENT" "\${pagenttask}"	
+	fi
+	exit \$?
 EOF
 fi
 
