@@ -1,0 +1,69 @@
+#!/bin/sh
+#set -x
+
+if ! [ $# -eq 2 ]; then
+     echo "Syntax: dbgmgr_security ENABLE|DISABLE <output-script>" >&2
+     exit 8
+fi
+verb="$1"
+script="$2"
+
+zbrew=`whence zbrew`
+zbrewdir=${zbrew%/*} 
+zbrewroot=${zbrewdir%/*}
+
+cat << EOF >${script}
+#!/bin/sh
+export PATH=${zbrewdir}:\$PATH
+. zbrewsetswenv eqae20
+. \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
+export PRODUCT_CODE="$PRODUCT_CODE"
+if \`undefinedProperty "\${EQAE20_TZ_OVERRIDE}"\` ; then
+     if [ -z "\$TZ" ]; then
+          echo "dbgmgr: One of TZ or EQAE20_TZ_OVERRIDE must be specified" >&2
+          exit 4
+     else
+                 debug_tz="\${TZ}"
+     fi
+else
+         debug_tz="\${EQAE20_TZ_OVERRIDE}"
+fi
+
+if \`undefinedProperty "\${EQAE20_DBGMGR_CLIENT}"\` ; then
+     echo "dbgmgr: EQAE20_DBGMGR_CLIENT must be specified" >&2
+     exit 4
+fi
+if \`undefinedProperty "\${EQAE20_DBGMGR_HOST}"\` ; then
+     echo "dbgmgr: EQAE20_DBGMGR_HOST must be specified" >&2
+     exit 4
+fi
+
+startedTask="//*
+//* Debug Manager
+//*
+//DBGMGR PROC PRM=,
+//            LEPRM='RPTOPTS(ON)',
+//            TZ='EST5EDT',
+//            CLIENT=5335,
+//            HOST=5336,
+//            HLQ=ZBREWT.EQAE20
+//*
+//DBGMGR   EXEC PGM=EQAZPCM,REGION=0M,TIME=NOLIMIT,
+//            PARM=('&LEPRM ENVAR(\\\"TZ=&TZ\\\")/&HOST &CLIENT &PRM')
+//STEPLIB  DD DISP=SHR,DSN=&HLQ..SEQAAUTH
+//SYSPRINT DD SYSOUT=*
+//SYSOUT   DD SYSOUT=*
+//            PEND
+//*"
+
+procregistrar eqae20 "${verb}" "dbgmgr" "\${startedTask}"
+exit \$?
+EOF
+
+if [ $? -gt 0 ]; then
+        echo "Unable to create EQAE20 Update script: ${script}." >&2
+        exit 16
+fi
+
+chmod u+x "${script}"
+exit 0

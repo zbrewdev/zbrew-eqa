@@ -1,0 +1,61 @@
+#!/bin/sh
+
+if ! [ $# -eq 2 ]; then
+	echo "Syntax: lla ENABLE|DISABLE <output-script>" >&2
+	exit 8
+fi
+verb="$1"
+script="$2"
+
+zbrew=`whence zbrew`
+zbrewdir=${zbrew%/*} 
+zbrewroot=${zbrewdir%/*}
+
+if [ "${verb}" = "DISABLE" ]; then
+	cat << EOF >${script}
+#!/bin/sh
+export PRODUCT_CODE="${PRODUCT_CODE}"
+export PATH=${zbrewdir}:\$PATH
+. zbrewsetswenv eqae20
+. \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
+
+datasets="\${ZBREW_TGT_HLQ}EQAE20.SEQAMOD"
+if  \`supportsMFI "\$PRODUCT_CODE"\`; then
+	datasets="\${datasets} \${ZBREW_TGT_HLQ}EQAE20.SEQABMOD"
+fi
+llregistrar eqae20 disable "\${datasets}"
+
+exit $?
+EOF
+	chmod u+x "${script}"
+	exit 0
+fi
+
+#
+# ENABLE
+#
+cat << EOF >${script}
+#!/bin/sh
+#set -x
+
+export PATH=${zbrewdir}:\$PATH
+. zbrewswsetenv eqae20
+. \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
+export PRODUCT_CODE="${PRODUCT_CODE}"
+
+datasets="\${ZBREW_TGT_HLQ}EQAE20.SEQAMOD"
+if  \`supportsMFI "\$PRODUCT_CODE"\`; then
+	datasets="\${datasets} \${ZBREW_TGT_HLQ}EQAE20.SEQABMOD"
+fi
+llregistrar eqae20 enable "\${datasets}"
+
+exit \$?
+EOF
+
+if [ $? -gt 0 ]; then
+	echo "Unable to create EQAE20 Update script: ${script}." >&2
+	exit 16
+fi
+
+chmod u+x "${script}"
+exit 0

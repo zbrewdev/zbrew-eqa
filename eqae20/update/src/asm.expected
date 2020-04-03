@@ -1,0 +1,48 @@
+/* IBM z/OS Debugger Version 14 Release 2 Mod 0                       */
+^.*$
+^.*$
+/* The operating system has generated the following message:          */
+/*    EQA2458I SVC Screening is disabled by EQAOPTS. Handling of      */
+/* non-LE events is not available.  Debugging of non-LE programs will */
+/*  be restricted in this z/OS Debugger session.                      */
+/*                                                                    */
+/* *** Commands file commands follow ***                              */
+ COMMENT SHOW BUILD DATE/TIME AND SERVICE LEVEL (IF ANY) ;
+ CALL %VER ;
+/* IBM z/OS Debugger Version 14 Release 2 Mod 0                       */
+^.*$
+^.*$
+ SET SOURCE ON ( DTIVPA ) EQALANGX ;
+ LDD DTIVPA ;
+ QUERY LOCATION ;
+/* You are executing commands from the run-time command-list.         */
+/* The program is currently executing prolog code for DTIVPA ::>      */
+/* DTIVPA.                                                            */
+ AT TERMINATION
+   DO ;
+     QUERY LOCATION ;
+     QUIT ;
+   END ;
+ AT STATEMENT 48
+   DO ;
+     QUERY LOCATION ;
+     LIST R10 + 0 ;
+     CLEAR AT STATEMENT 48 ;
+     GO ;
+   END ;
+ AT STATEMENT 55
+   DO ;
+     QUERY LOCATION ;
+     LIST R02 ;
+     GO ;
+   END ;
+ GO ;
+/* You are executing commands in the STATEMENT DTIVPA ::> DTIVPA :>   */
+/* 48 breakpoint.                                                     */
+/* The current location is DTIVPA ::> DTIVPA :> 48.                   */
+/* X'0000000A'                                                        */
+/* You are executing commands in the STATEMENT DTIVPA ::> DTIVPA :>   */
+/* 55 breakpoint.                                                     */
+/* The current location is DTIVPA ::> DTIVPA :> 55.                   */
+^.* R02 = .*$
+/* You are executing commands in the TERMINATION breakpoint.          */

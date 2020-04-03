@@ -1,0 +1,102 @@
+#!/bin/sh
+#set -x
+
+if ! [ $# -eq 2 ]; then
+	echo "Syntax: dbgmgr_saf ENABLE|DISABLE <output-script>" >&2
+	exit 8
+fi
+verb="$1"
+script="$2"
+
+zbrew=`whence zbrew`
+zbrewdir=${zbrew%/*} 
+zbrewroot=${zbrewdir%/*}
+
+cat << EOF >${script}
+#!/bin/sh
+export PATH=${zbrewdir}:\$PATH
+. zbrewsetswenv eqae20
+. \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
+export PRODUCT_CODE="$PRODUCT_CODE"
+
+if ! \`supportsDebugManager "\$PRODUCT_CODE"\`; then
+	exit 0
+fi
+sp=\`securityProduct\`
+if [ "\${sp}" != "RACF" ]; then
+	echo "Security product support for \${sp} not implemented yet" >&2
+	exit 16
+fi
+
+EOF
+
+if [ $? -gt 0 ]; then
+	echo "Unable to create EQAE20 Update script: ${script}." >&2
+	exit 16
+fi
+
+chmod u+x "${script}"
+
+if [ "${verb}" = "DISABLE" ]; then
+	cat << EOF >>${script}
+
+	tsocmd "PERMIT BPX.SERVER CLASS(FACILITY) DELETE ID(STCDBM)" >/dev/null 2>/dev/null
+	tsocmd "RDELETE STARTED DBGMGR.*" >/dev/null 2>&1
+	tsocmd "DELUSER STCDBM" >/dev/null 2>&1
+	issueTSO "SETROPTS RACLIST(FACILITY) REFRESH"
+	chk "\$?" "Unable to refresh facility task class"
+	exit 0
+EOF
+
+else 
+	cat << EOF >>${script}
+	issueTSO "SETROPTS GENERIC(FACILITY)"
+	chk "\$?" "Unable to set generic(facility)"
+
+	issueTSO "SETROPTS CLASSACT(FACILITY) RACLIST(FACILITY)"
+	chk "\$?" "Unable to set classact(facility)"
+
+	issueTSO "SETROPTS GENERIC(STARTED)"
+	chk "\$?" "Unable to set generic(started)"
+
+	issueTSO "SETROPTS CLASSACT(STARTED) RACLIST(STARTED)"
+	chk "\$?" "Unable to activate STARTED class"
+
+	if ! \`racfGroupExists STCGROUP\` ; then
+		issueTSO "RDEFINE STARTED ** STDATA(USER(=MEMBER) GROUP(STCGROUP) TRACE(YES))"
+		chk "\$?" "Unable to define STCGROUP"
+
+		issueTSO "ADDGROUP STCGROUP OMVS(AUTOGID) DATA('GROUP WITH OMVS SEGMENT FOR STARTED TASKS')"
+		chk "\$?" "Unable to add group with OMVS segment for started tasks"
+	fi
+
+	tsocmd "DELUSER STCDBM" >/dev/null 2>&1
+
+	issueTSO "ADDUSER STCDBM DFLTGRP(STCGROUP) NOPASSWORD NAME('DEBUG MANAGER') OMVS(AUTOUID HOME(/tmp) PROGRAM(/bin/sh) ) DATA('IBM z/OS Debugger')"
+	chk "\$?" "Unable to create user STCDBM"
+
+	tsocmd "RDELETE STARTED DBGMGR.*" >/dev/null 2>&1
+
+	issueTSO "RDEFINE STARTED DBGMGR.* DATA('DEBUG MANAGER') STDATA(USER(STCDBM) GROUP(STCGROUP) TRUSTED(NO))"
+	chk "\$?" "Unable to define started task profile DBGMGR.*"
+
+	issueTSO "SETROPTS RACLIST(STARTED) REFRESH"
+	chk "\$?" "Unable to refresh started task class"
+
+	if ! \`racfProfileExists "FACILITY" "BPX.SERVER"\` ; then
+		issueTSO "RDEFINE FACILITY BPX.SERVER UACC(NONE)"
+		chk "\$?" "Unable to define profile BPX.SERVER"
+	fi
+
+	tsocmd "PERMIT BPX.SERVER CLASS(FACILITY) DELETE ID(STCDBM)" >/dev/null 2>/dev/null
+	issueTSO "PERMIT BPX.SERVER CLASS(FACILITY) ACCESS(UPDATE) ID(STCDBM)"
+	chk "\$?" "Unable to refresh started task class"
+
+	issueTSO "SETROPTS RACLIST(FACILITY) REFRESH"
+	chk "\$?" "Unable to refresh facility task class"
+
+	exit 0
+EOF
+fi
+
+exit 0

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if ! [ $# -eq 2 ]; then
-	echo "Syntax: registration ENABLE|DISABLE <output-script>" >&2
+	echo "Syntax: tim ENABLE|DISABLE <output-script>" >&2
 	exit 8
 fi
 verb="$1"
@@ -13,19 +13,16 @@ zbrewroot=${zbrewdir%/*}
 
 cat << EOF >${script}
 #!/bin/sh
-#set -x
 export PATH=${zbrewdir}:\$PATH
-export PRODUCT_CODE="${PRODUCT_CODE}"
-. zbrewsetenv
-. \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
+. zbrewsetswenv eqae20
+. $ZBREW_WORKROOT/zbrew-eqa/eqafuncs
+export PRODUCT_CODE="$PRODUCT_CODE"
 
-datasets="\${ZBREW_TGT_HLQ}EQAE20.SEQAAUTH"
 if \`supportsMFI "\$PRODUCT_CODE"\`; then
-	datasets="\${datasets} \${ZBREW_TGT_HLQ}EQAE20.SEQABMOD"
+	echo "MFI Configuration tbd" >&2
+	exit 16
 fi
-
-apfregistrar eqae20 "${verb}" "\${datasets}"
-exit $?
+exit 0
 EOF
 
 if [ $? -gt 0 ]; then

@@ -2,6 +2,9 @@
 #set -x
 . zbrewsetenv
 
+props="${ZBREW_WORKROOT}/order/eqae20order.json"
+zbrewpropse eqae20 order "${props}"
+
 eqaRoot="${ZBREW_WORKROOT}/deconfig/eqae20"
 mkdir -p "${eqaRoot}"
 rc=$?
@@ -12,9 +15,8 @@ fi
 
 cd "${mydir}/generate"
 steps=`echo *`
-reversesteps=`echo "${steps}" | awk '{ for (i=NF; i>1; i--) printf("%s ",$i); print $1; }'`
 cd $OLDPWD
-for step in ${reversesteps}; do
+for step in ${steps}; do
 	script="${eqaRoot}/${step}.sh"
 	"${mydir}/generate/${step}" DISABLE "${script}"
 	if [ $? -gt 0 ]; then
