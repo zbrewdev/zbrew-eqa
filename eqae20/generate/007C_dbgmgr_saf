@@ -71,14 +71,20 @@ else
 	fi
 
 	tsocmd "DELUSER STCDBM" >/dev/null 2>&1
-
 	issueTSO "ADDUSER STCDBM DFLTGRP(STCGROUP) NOPASSWORD NAME('DEBUG MANAGER') OMVS(AUTOUID HOME(/tmp) PROGRAM(/bin/sh) ) DATA('IBM z/OS Debugger')"
 	chk "\$?" "Unable to create user STCDBM"
 
 	tsocmd "RDELETE STARTED DBGMGR.*" >/dev/null 2>&1
-
 	issueTSO "RDEFINE STARTED DBGMGR.* DATA('DEBUG MANAGER') STDATA(USER(STCDBM) GROUP(STCGROUP) TRUSTED(NO))"
 	chk "\$?" "Unable to define started task profile DBGMGR.*"
+
+	tsocmd "DELUSER STCDBM" >/dev/null 2>&1
+	issueTSO "ADDUSER PAGENT DFLTGRP(SYS1) OMVS(UID(0) SHARED HOME('/')) NAME('TCP/IP POLICY AGENT') NOPASSWORD"
+	chk "\$?" "Unable to create user PAGENT"
+
+	tsocmd "RDELETE STARTED PAGENT.*" >/dev/null 2>&1
+	issueTSO "RDEFINE STARTED PAGENT.* STDATA(USER(PAGENT) GROUP(SYS1)) DATA('TCP/IP POLICY AGENT')
+	chk "\$?" "Unable to define started task profile PAGENT.*"
 
 	issueTSO "SETROPTS RACLIST(STARTED) REFRESH"
 	chk "\$?" "Unable to refresh started task class"
@@ -88,13 +94,73 @@ else
 		chk "\$?" "Unable to define profile BPX.SERVER"
 	fi
 
+	if ! \`racfProfileExists "OPERCMDS" "MVS.SERVMGR.PAGENT"\` ; then
+		issueTSO "RDEFINE OPERCMDS MVS.SERVMGR.PAGENT UACC(NONE) DATA('restrict startup of policy agent')"
+		chk "\$?" "Unable to define profile MVS.SERVMGR.PAGENT"
+	fi
+
 	tsocmd "PERMIT BPX.SERVER CLASS(FACILITY) DELETE ID(STCDBM)" >/dev/null 2>/dev/null
 	issueTSO "PERMIT BPX.SERVER CLASS(FACILITY) ACCESS(UPDATE) ID(STCDBM)"
-	chk "\$?" "Unable to refresh started task class"
+	chk "\$?" "Unable to permit BPX.SERVER ID(STCDBM)"
+
+	tsocmd "PERMIT MVS.SERVMGR.PAGENT(OPERCMDS) DELETE ID(PAGENT)" >/dev/null 2>/dev/null
+	issueTSO "PERMIT MVS.SERVMGR.PAGENT CLASS(OPERCMDS) ACCESS(CONTROL) ID(PAGENT)"
+	chk "\$?" "Unable to permit MVS.SERVMGR.PAGENT ID(PAGENT)"
 
 	issueTSO "SETROPTS RACLIST(FACILITY) REFRESH"
 	chk "\$?" "Unable to refresh facility task class"
 
+	issueTSO "SETROPTS RACLIST(OPERCMDS) REFRESH"
+	chk "\$?" "Unable to refresh opercmds class"
+
+	issueTSO "SETROPTS GENERIC(SERVAUTH)"
+	chk "\$?" "Unable to set generic(servauth)"
+
+	issueTSO "SETROPTS CLASSACT(SERVAUTH) RACLIST(SERVAUTH)"
+	chk "\$?" "Unable to set classact(servauth)"
+
+	tsocmd "RDELETE SERVAUTH EZB.INITSTACK.**" >/dev/null 2>&1
+	issueTSO "RDEFINE SERVAUTH EZB.INITSTACK.** UACC(NONE)"
+	chk "\$?" "Unable to define servauth profile EZB.INITSTACK.**"
+
+	tsocmd "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) DELETE ID(PAGENT)" >/dev/null 2>/dev/null
+	tsocmd "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) DELETE ID(OMPROUTE)" >/dev/null 2>/dev/null
+	tsocmd "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) DELETE ID(OSNMPD)" >/dev/null 2>/dev/null
+	tsocmd "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) DELETE ID(IOBSNMP)" >/dev/null 2>/dev/null
+	tsocmd "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) DELETE ID(NAMED)" >/dev/null 2>/dev/null
+
+	issueTSO "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) ACCESS(READ) ID(PAGENT)"
+	chk "\$?" "Unable to permit EZB.INITSTACK ID(PAGENT)"
+
+	issueTSO "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) ACCESS(READ) ID(OMPROUTE)"
+	chk "\$?" "Unable to permit EZB.INITSTACK ID(OMPROUTE)"
+
+	issueTSO "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) ACCESS(READ) ID(OSNMPD)"
+	chk "\$?" "Unable to permit EZB.INITSTACK ID(OSNMPD)"
+
+	issueTSO "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) ACCESS(READ) ID(IOBSNMP)"
+	chk "\$?" "Unable to permit EZB.INITSTACK ID(IOBSNMP)"
+
+	issueTSO "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) ACCESS(READ) ID(NAMED)
+	chk "\$?" "Unable to permit EZB.INITSTACK ID(NAMED)"
+
+	issueTSO "SETROPTS RACLIST(SERVAUTH) REFRESH"
+	chk "\$?" "Unable to refresh servauth class"
+
+	issueTSO "SETROPTS RACLIST(OPERCMDS) REFRESH"
+	chk "\$?" "Unable to refresh opercmds class"
+
+	if ! \`racfProfileExists "FACILITY" "IRR.DIGTCERT.LIST"\` ; then
+		issueTSO "RDEFINE FACILITY IRR.DIGTCERT.LIST UACC(NONE)"
+		chk "\$?" "Unable to define profile IRR.DIGTCERT.LIST"
+	fi
+	if ! \`racfProfileExists "FACILITY" "IRR.DIGTCERT.LISTRING"\` ; then
+		issueTSO "RDEFINE FACILITY IRR.DIGTCERT.LISTRING UACC(NONE)"
+		chk "\$?" "Unable to define profile IRR.DIGTCERT.LISTRING"
+	fi
+
+
+"
 	exit 0
 EOF
 fi

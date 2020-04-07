@@ -32,25 +32,56 @@ cat << EOF >${script}
 	fi
 
 	ttlsrule="
-	TTLSRule zOS_Debugger_Debug_Manager  
-	{
-	  LocalPortRange      \${EQAE20_DBGMGR_CLIENT}
-	  Direction           Inbound
-	  TTLSGroupActionRef  act_zOS_Debugger_Debug_Manager
-	}
-	TTLSEnvironmentAction  act_zOS_Debugger_Debug_Manager
-	{
-	  HandshakeRole Server
-	  TTLSKeyRingParms
-	  {
-	    Keyring dbgmgr_security.racf # Keyring must be owned by the Debug Manager
-	  }
-	}
-	TTLSGroupAction grp_Production
-	{
-	  TTLSEnabled On
-	  Trace       2
-	}"
+TTLSRule zOS_Debugger_Debug_Manager  
+{
+  LocalPortRange      \${EQAE20_DBGMGR_CLIENT}
+  Direction           Inbound
+  TTLSGroupActionRef  act_zOS_Debugger_Debug_Manager
+}
+TTLSEnvironmentAction  act_zOS_Debugger_Debug_Manager
+{
+  HandshakeRole Server
+  TTLSKeyRingParms
+  {
+    Keyring dbgmgr_security.racf # Keyring must be owned by the Debug Manager
+  }
+  TTLSEnvironmentAdvancedParms
+  {
+    TLSV1.2 On
+    SSLV3   Off
+  }
+}
+TTLSRule zOS_Debugger_Debug_Probe-Client
+{
+  RemotePortRange \${EQAE20_DBGMGR_REMOTE_PORT_RANGE}
+  Direction Outbound
+  TTLSGroupActionRef grp_Production
+  TTLSEnvironmentActionRef act_zOS_Debug_Probe-Client
+}
+TTLSEnvironmentAction act_zOS_Debug_Probe-Client
+{
+  HandshakeRole Client
+  TTLSKeyRingParms
+  {
+    Keyring *AUTH*/*
+  }
+  TTLSEnvironmentAdvancedParms
+  {
+    TLSV1.2 On
+  }
+}
+TTLSGroupAction grp_Production
+{
+  TTLSEnabled On
+  TTLSGroupAdvancedParmsRef TLSv1.2
+  Trace       3
+}
+TTLSGroupAdvancedParms TLSv1.2
+{
+  Envfile /etc/pagent.ttls.TLSv1.2.env
+}"
+
+	cat "${ttlsrule}"
 
 	ttlsresult=\`opercmd 'd tcpip,,netstat,config' 2>/dev/null | awk ' /TTLS:/ { print \$2; }'\`
 	pagentresult=\`opercmd 'd tcpip,,netstat,config' 2>/dev/null | awk ' /PROCNAME: PAGENT/ { print; }'\`
