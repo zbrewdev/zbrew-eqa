@@ -22,8 +22,8 @@ export PRODUCT_CODE="$PRODUCT_CODE"
 if ! \`supportsDebugManager "\$PRODUCT_CODE"\`; then
 	exit 0
 fi
-sp=\`securityProduct\`
-if [ "\${sp}" != "RACF" ]; then
+sp=\`secmgr\`
+if [ "\${sp}" != "RCVT" ]; then
 	echo "Security product support for \${sp} not implemented yet" >&2
 	exit 16
 fi
@@ -43,24 +43,17 @@ if [ "${verb}" = "DISABLE" ]; then
 	tsocmd "PERMIT BPX.SERVER CLASS(FACILITY) DELETE ID(STCDBM)" >/dev/null 2>/dev/null
 	tsocmd "RDELETE STARTED DBGMGR.*" >/dev/null 2>&1
 	tsocmd "DELUSER STCDBM" >/dev/null 2>&1
-	issueTSO "SETROPTS RACLIST(FACILITY) REFRESH"
-	chk "\$?" "Unable to refresh facility task class"
+	
+	racfRefreshClasses "FACILITY OPERCMDS SERVAUTH STARTED"
 	exit 0
 EOF
 
 else 
 	cat << EOF >>${script}
-	issueTSO "SETROPTS GENERIC(FACILITY)"
-	chk "\$?" "Unable to set generic(facility)"
+	racfSetGenericClasses "FACILITY STARTED SERVAUTH"
+	chk "\$?" "Unable to configure EQAE20"
 
-	issueTSO "SETROPTS CLASSACT(FACILITY) RACLIST(FACILITY)"
-	chk "\$?" "Unable to set classact(facility)"
-
-	issueTSO "SETROPTS GENERIC(STARTED)"
-	chk "\$?" "Unable to set generic(started)"
-
-	issueTSO "SETROPTS CLASSACT(STARTED) RACLIST(STARTED)"
-	chk "\$?" "Unable to activate STARTED class"
+	racfActivateAndShareClasses "FACILITY STARTED SERVAUTH"
 
 	if ! \`racfGroupExists STCGROUP\` ; then
 		issueTSO "RDEFINE STARTED ** STDATA(USER(=MEMBER) GROUP(STCGROUP) TRACE(YES))"
@@ -78,16 +71,13 @@ else
 	issueTSO "RDEFINE STARTED DBGMGR.* DATA('DEBUG MANAGER') STDATA(USER(STCDBM) GROUP(STCGROUP) TRUSTED(NO))"
 	chk "\$?" "Unable to define started task profile DBGMGR.*"
 
-	tsocmd "DELUSER STCDBM" >/dev/null 2>&1
+	tsocmd "DELUSER PAGENT" >/dev/null 2>&1
 	issueTSO "ADDUSER PAGENT DFLTGRP(SYS1) OMVS(UID(0) SHARED HOME('/')) NAME('TCP/IP POLICY AGENT') NOPASSWORD"
 	chk "\$?" "Unable to create user PAGENT"
 
 	tsocmd "RDELETE STARTED PAGENT.*" >/dev/null 2>&1
-	issueTSO "RDEFINE STARTED PAGENT.* STDATA(USER(PAGENT) GROUP(SYS1)) DATA('TCP/IP POLICY AGENT')
+	issueTSO "RDEFINE STARTED PAGENT.* STDATA(USER(PAGENT) GROUP(SYS1)) DATA('TCP/IP POLICY AGENT')"
 	chk "\$?" "Unable to define started task profile PAGENT.*"
-
-	issueTSO "SETROPTS RACLIST(STARTED) REFRESH"
-	chk "\$?" "Unable to refresh started task class"
 
 	if ! \`racfProfileExists "FACILITY" "BPX.SERVER"\` ; then
 		issueTSO "RDEFINE FACILITY BPX.SERVER UACC(NONE)"
@@ -99,56 +89,24 @@ else
 		chk "\$?" "Unable to define profile MVS.SERVMGR.PAGENT"
 	fi
 
-	tsocmd "PERMIT BPX.SERVER CLASS(FACILITY) DELETE ID(STCDBM)" >/dev/null 2>/dev/null
-	issueTSO "PERMIT BPX.SERVER CLASS(FACILITY) ACCESS(UPDATE) ID(STCDBM)"
-	chk "\$?" "Unable to permit BPX.SERVER ID(STCDBM)"
+	racfPermitUsers "FACILITY" "BPX.SERVER" "UPDATE" "STCDBM"
+	chk "\$?" "Unable to configure EQAE20"
 
-	tsocmd "PERMIT MVS.SERVMGR.PAGENT(OPERCMDS) DELETE ID(PAGENT)" >/dev/null 2>/dev/null
-	issueTSO "PERMIT MVS.SERVMGR.PAGENT CLASS(OPERCMDS) ACCESS(CONTROL) ID(PAGENT)"
-	chk "\$?" "Unable to permit MVS.SERVMGR.PAGENT ID(PAGENT)"
+	racfPermitUsers "OPERCMDS" "MVS.SERVMGR.PAGENT" "CONTROL" "PAGENT"
+	chk "\$?" "Unable to configure EQAE20"
 
-	issueTSO "SETROPTS RACLIST(FACILITY) REFRESH"
-	chk "\$?" "Unable to refresh facility task class"
+	if ! \`racfProfileExists "SERVAUTH" "EZB.INITSTACK.**"\` ; then
+		issueTSO "RDEFINE SERVAUTH EZB.INITSTACK.** UACC(NONE)"
+		chk "\$?" "Unable to define servauth profile EZB.INITSTACK.**"
+	fi
 
-	issueTSO "SETROPTS RACLIST(OPERCMDS) REFRESH"
-	chk "\$?" "Unable to refresh opercmds class"
+	racfPermitUsers "SERVAUTH" "EZB.INITSTACK.**" "READ" "PAGENT" "OMPROUTE" "OSNMPD" "IOBSNMP" "NAMED"
+	chk "\$?" "Unable to configure EQAE20"
 
-	issueTSO "SETROPTS GENERIC(SERVAUTH)"
-	chk "\$?" "Unable to set generic(servauth)"
-
-	issueTSO "SETROPTS CLASSACT(SERVAUTH) RACLIST(SERVAUTH)"
-	chk "\$?" "Unable to set classact(servauth)"
-
-	tsocmd "RDELETE SERVAUTH EZB.INITSTACK.**" >/dev/null 2>&1
-	issueTSO "RDEFINE SERVAUTH EZB.INITSTACK.** UACC(NONE)"
-	chk "\$?" "Unable to define servauth profile EZB.INITSTACK.**"
-
-	tsocmd "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) DELETE ID(PAGENT)" >/dev/null 2>/dev/null
-	tsocmd "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) DELETE ID(OMPROUTE)" >/dev/null 2>/dev/null
-	tsocmd "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) DELETE ID(OSNMPD)" >/dev/null 2>/dev/null
-	tsocmd "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) DELETE ID(IOBSNMP)" >/dev/null 2>/dev/null
-	tsocmd "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) DELETE ID(NAMED)" >/dev/null 2>/dev/null
-
-	issueTSO "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) ACCESS(READ) ID(PAGENT)"
-	chk "\$?" "Unable to permit EZB.INITSTACK ID(PAGENT)"
-
-	issueTSO "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) ACCESS(READ) ID(OMPROUTE)"
-	chk "\$?" "Unable to permit EZB.INITSTACK ID(OMPROUTE)"
-
-	issueTSO "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) ACCESS(READ) ID(OSNMPD)"
-	chk "\$?" "Unable to permit EZB.INITSTACK ID(OSNMPD)"
-
-	issueTSO "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) ACCESS(READ) ID(IOBSNMP)"
-	chk "\$?" "Unable to permit EZB.INITSTACK ID(IOBSNMP)"
-
-	issueTSO "PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) ACCESS(READ) ID(NAMED)
-	chk "\$?" "Unable to permit EZB.INITSTACK ID(NAMED)"
-
-	issueTSO "SETROPTS RACLIST(SERVAUTH) REFRESH"
-	chk "\$?" "Unable to refresh servauth class"
-
-	issueTSO "SETROPTS RACLIST(OPERCMDS) REFRESH"
-	chk "\$?" "Unable to refresh opercmds class"
+	if ! \`racfProfileExists "SERVAUTH" "EZB.PAGENT.**"\` ; then
+		issueTSO "RDEFINE SERVAUTH EZB.PAGENT.** UACC(NONE) DATA('restrict access to pasearch command')"
+		racfPermitUsers "SERVAUTH" "EZB.PAGENT.**" "READ" "TCPADMIN"
+	fi
 
 	if ! \`racfProfileExists "FACILITY" "IRR.DIGTCERT.LIST"\` ; then
 		issueTSO "RDEFINE FACILITY IRR.DIGTCERT.LIST UACC(NONE)"
@@ -159,8 +117,9 @@ else
 		chk "\$?" "Unable to define profile IRR.DIGTCERT.LISTRING"
 	fi
 
+	racfRefreshClasses "FACILITY STARTED SERVAUTH OPERCMDS"
+	chk "\$?" "Unable to configure EQAE20"
 
-"
 	exit 0
 EOF
 fi
