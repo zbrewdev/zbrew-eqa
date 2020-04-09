@@ -14,6 +14,9 @@ zbrewroot=${zbrewdir%/*}
 if [ "${verb}" = "DISABLE" ]; then
 	cat << EOF >${script}
 #!/bin/sh
+#set -x
+export PATH=${zbrewdir}:\$PATH
+. zbrewsetenv
 sp=\`secmgr\`
 if [ "\${sp}" != "RCVT" ]; then
 	echo "Security product support for \${sp} not implemented yet" >&2
@@ -37,8 +40,8 @@ export PATH=${zbrewdir}:\$PATH
 . zbrewsetswenv eqae20
 
 if [ "\${EQAE20_AUTHDEBUG_USERS}" != "NONE" ] && [ "\${EQAE20_AUTHDEBUG_USERS}" != "" ]; then
-	sp=\`securityProduct\`
-	if [ "\${sp}" != "RACF" ]; then
+	sp=\`secmgr\`
+	if [ "\${sp}" != "RCVT" ]; then
 		echo "Security product support for \${sp} not implemented yet" >&2
 		exit 16
 	fi

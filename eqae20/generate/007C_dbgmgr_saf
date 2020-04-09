@@ -117,7 +117,26 @@ else
 		chk "\$?" "Unable to define profile IRR.DIGTCERT.LISTRING"
 	fi
 
-	racfRefreshClasses "FACILITY STARTED SERVAUTH OPERCMDS"
+	racfPermitUsers "FACILITY" "IRR.DIGTCERT.LIST" "READ" "STCDBM"
+	chk "\$?" "Unable to configure EQAE20"
+
+	racfPermitUsers "FACILITY" "IRR.DIGTCERT.LISTRING" "READ" "STCDBM"
+	chk "\$?" "Unable to configure EQAE20"
+
+	subjectsDN=\`racfSubjectsDN "Debug Manager"\`
+	issueTSO "RACDCERT ID(stcdbm) GENCERT \${subjectsDN} KEYUSAGE(HANDSHAKE) WITHLABEL('dbgmgr')"
+	chk "\$?" "Unable to configure EQAE20"
+
+	tsocmd "racdcert listring(dbgmgr.racf) id(stcdbm)" >/dev/null 2>&1
+	if [ \$? -gt 0 ]; then
+		issueTSO "RACDCERT ID(stcdbm) ADDRING(dbgmgr.racf)"
+		chk "\$?" "Unable to create dbgmgr.racf ring"
+	fi
+
+	issueTSO "RACDCERT ID(STCDBM) CONNECT(LABEL('dbgmgr') RING(dbgmgr.racf))"
+	chk "\$?" "Unable to create connect user certificate to ring"
+
+	racfRefreshClasses "FACILITY STARTED SERVAUTH OPERCMDS DIGTCERT"
 	chk "\$?" "Unable to configure EQAE20"
 
 	exit 0
