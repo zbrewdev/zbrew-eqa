@@ -1,0 +1,47 @@
+#!/bin/sh
+#set -x
+
+if ! [ $# -eq 2 ]; then
+	echo "Syntax: cics ENABLE|DISABLE <output-script>" >&2
+	exit 8
+fi
+verb="$1"
+script="$2"
+
+zbrew=`whence zbrew`
+zbrewdir=${zbrew%/*} 
+zbrewroot=${zbrewdir%/*}
+
+cat << EOF >${script}
+#!/bin/sh
+export PATH=${zbrewdir}:\$PATH
+. zbrewsetswenv eqae20
+. \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
+
+EOF
+
+if [ $? -gt 0 ]; then
+	echo "Unable to create EQAE20 Update script: ${script}." >&2
+	exit 16
+fi
+
+chmod u+x "${script}"
+
+if [ "${verb}" = "DISABLE" ]; then
+	cat << EOF >>${script}
+	ccsdregistrar eqae20 ${verb} 
+	exit 0
+EOF
+
+else 
+	cat << EOF >>${script}
+	#
+	# remove the ADD GROUP line at the end of the CCSD sample, but keep everything else
+	# 
+	ccsd=\`cat "//'\${ZBREW_TGT_HLQ}EQAE20.SEQASAMP(EQACCSD)'" | awk ' /[ ]*ADD[ ]+GROUP/ { print "*"; next; } // {print}'\`
+	ccsdregistrar eqae20 ${verb} "\${ccsd}"
+	exit \$?
+EOF
+fi
+
+exit 0

@@ -133,7 +133,7 @@ else
 		chk "\$?" "Unable to create dbgmgr.racf ring"
 	fi
 
-	issueTSO "RACDCERT ID(STCDBM) CONNECT(LABEL('dbgmgr') RING(dbgmgr.racf))"
+	issueTSO "RACDCERT ID(STCDBM) CONNECT(ID(STCDBM) LABEL('dbgmgr') RING(dbgmgr.racf) USAGE(PERSONAL) DEFAULT)"
 	chk "\$?" "Unable to create connect user certificate to ring"
 
 	racfRefreshClasses "FACILITY STARTED SERVAUTH OPERCMDS DIGTCERT"

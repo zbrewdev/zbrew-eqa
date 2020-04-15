@@ -1,0 +1,68 @@
+#!/bin/sh
+#set -x
+
+if ! [ $# -eq 2 ]; then
+	echo "Syntax: browse ENABLE|DISABLE <output-script>" >&2
+	exit 8
+fi
+verb="$1"
+script="$2"
+
+zbrew=`whence zbrew`
+zbrewdir=${zbrew%/*} 
+zbrewroot=${zbrewdir%/*}
+
+cat << EOF >${script}
+#!/bin/sh
+export PATH=${zbrewdir}:\$PATH
+. zbrewsetswenv eqae20
+. \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
+
+sp=\`secmgr\`
+if [ "\${sp}" != "RCVT" ]; then
+	echo "Security product support for \${sp} not implemented yet" >&2
+	exit 16
+fi
+
+EOF
+
+if [ $? -gt 0 ]; then
+	echo "Unable to create EQAE20 Update script: ${script}." >&2
+	exit 16
+fi
+
+chmod u+x "${script}"
+
+if [ "${verb}" = "DISABLE" ]; then
+	cat << EOF >>${script}
+
+	tsocmd "PERMIT EQADTOOL.BROWSE.MVS CLASS(FACILITY) DELETE" >/dev/null 2>/dev/null
+	
+	racfRefreshClasses "FACILITY"
+	exit \$?
+EOF
+
+else 
+	cat << EOF >>${script}
+	racfSetGenericClasses "FACILITY"
+	chk "\$?" "Unable to configure EQAE20"
+
+	racfPermitUsers "FACILITY" "EQADTOOL.BROWSE.MVS" "NONE" "\${EQAE20_BROWSE_MVS_USERS_NONE}"
+	chk "\$?" "Unable to configure EQAE20"
+	racfPermitUsers "FACILITY" "EQADTOOL.BROWSE.MVS" "READ" "\${EQAE20_BROWSE_MVS_USERS_READ}"
+	chk "\$?" "Unable to configure EQAE20"
+	racfPermitUsers "FACILITY" "EQADTOOL.BROWSE.MVS" "UPDDATE" "\${EQAE20_BROWSE_MVS_USERS_UPDATE}"
+	chk "\$?" "Unable to configure EQAE20"
+	racfPermitUsers "FACILITY" "EQADTOOL.BROWSE.CICS" "NONE" "\${EQAE20_BROWSE_CICS_USERS_NONE}"
+	chk "\$?" "Unable to configure EQAE20"
+	racfPermitUsers "FACILITY" "EQADTOOL.BROWSE.CICS" "READ" "\${EQAE20_BROWSE_CICS_USERS_READ}"
+	chk "\$?" "Unable to configure EQAE20"
+	racfPermitUsers "FACILITY" "EQADTOOL.BROWSE.CICS" "UPDATE" "\${EQAE20_BROWSE_CICS_USERS_UPDATE}"
+	chk "\$?" "Unable to configure EQAE20"
+	
+	racfRefreshClasses "FACILITY"
+	exit \$?
+EOF
+fi
+
+exit 0
