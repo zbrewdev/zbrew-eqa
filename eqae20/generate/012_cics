@@ -1,0 +1,58 @@
+#!/bin/sh
+#set -x
+
+if ! [ $# -eq 2 ]; then
+	echo "Syntax: cics ENABLE|DISABLE <output-script>" >&2
+	exit 8
+fi
+verb="$1"
+script="$2"
+
+zbrew=`whence zbrew`
+zbrewdir=${zbrew%/*} 
+zbrewroot=${zbrewdir%/*}
+
+cat << EOF >${script}
+#!/bin/sh
+export PATH=${zbrewdir}:\$PATH
+. zbrewsetswenv eqae20
+. \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
+
+EOF
+
+if [ $? -gt 0 ]; then
+	echo "Unable to create EQAE20 Update script: ${script}." >&2
+	exit 16
+fi
+
+chmod u+x "${script}"
+
+if [ "${verb}" = "DISABLE" ]; then
+	cat << EOF >>${script}
+	procregistrar eqae20 disable \${ZBREW_DFH_PROC}
+	chk "\$?" "Unable to configure EQAE20"
+	ccsdregistrar eqae20 disable
+	chk "\$?" "Unable to configure EQAE20"
+	exit 0
+EOF
+
+else 
+	cat << EOF >>${script}
+	#
+	# remove the ADD GROUP line at the end of the CCSD sample, but keep everything else
+	# 
+	ccsd=\`cat "//'\${ZBREW_TGT_HLQ}EQAE20.SEQASAMP(EQACCSD)'" | awk ' /[ ]*ADD[ ]+GROUP/ { print "*"; next; } // {print}'\`
+	ccsdregistrar eqae20 ${verb} "\${ccsd}"
+	chk "\$?" "Unable to configure EQAE20"
+
+	jcl=\`cat "//'\${ZBREW_DFH_PROCLIB}(\${ZBREW_DFH_PROC})'"\`
+	jcl=\`jclAddDatasetToDD "\${jcl}" "CICS" "DFHRPL" "\${ZBREW_TGT_HLQ}EQAE20.SEQAMOD"\`
+	chk "\$?" "Unable to add \${ZBREW_TGT_HLQ}EQAE20.SEQAMOD to CICS proclib \${ZBREW_DFH_PROCLIB}(\${ZBREW_DFH_PROC})"
+
+	procregistrar eqae20 enable \${ZBREW_DFH_PROC} "\${jcl}"
+	chk "\$?" "Unable to configure EQAE20"
+	exit \$?
+EOF
+fi
+
+exit 0

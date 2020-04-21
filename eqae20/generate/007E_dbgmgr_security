@@ -32,25 +32,57 @@ cat << EOF >${script}
 	fi
 
 	ttlsrule="
-	TTLSRule zOS_Debugger_Debug_Manager  
-	{
-	  LocalPortRange      \${EQAE20_DBGMGR_CLIENT}
-	  Direction           Inbound
-	  TTLSGroupActionRef  act_zOS_Debugger_Debug_Manager
-	}
-	TTLSEnvironmentAction  act_zOS_Debugger_Debug_Manager
-	{
-	  HandshakeRole Server
-	  TTLSKeyRingParms
-	  {
-	    Keyring dbgmgr_security.racf # Keyring must be owned by the Debug Manager
-	  }
-	}
-	TTLSGroupAction grp_Production
-	{
-	  TTLSEnabled On
-	  Trace       2
-	}"
+TTLSRule zOS_Debugger_Debug_Manager  
+{
+  LocalPortRange      \${EQAE20_DBGMGR_CLIENT}
+  Direction           Inbound
+  TTLSGroupActionRef  act_zOS_Debugger_Debug_Manager
+}
+TTLSEnvironmentAction  act_zOS_Debugger_Debug_Manager
+{
+  HandshakeRole Server
+  TTLSKeyRingParms
+  {
+    Keyring dbgmgr_security.racf # Keyring must be owned by the Debug Manager
+  }
+  TTLSEnvironmentAdvancedParms
+  {
+    TLSV1.2 On
+    SSLV3   Off
+  }
+}
+TTLSRule zOS_Debugger_Debug_Probe-Client
+{
+  RemotePortRange \${EQAE20_DBGMGR_REMOTE_PORT_RANGE}
+  Direction Outbound
+  TTLSGroupActionRef grp_Production
+  TTLSEnvironmentActionRef act_zOS_Debug_Probe-Client
+}
+TTLSEnvironmentAction act_zOS_Debug_Probe-Client
+{
+  HandshakeRole Client
+  TTLSKeyRingParms
+  {
+    Keyring *AUTH*/*
+  }
+  TTLSEnvironmentAdvancedParms
+  {
+    TLSV1.2 On
+  }
+}
+TTLSGroupAction grp_Production
+{
+  TTLSEnabled On
+  TTLSGroupAdvancedParmsRef TLSv1.2
+  Trace       3
+}
+TTLSGroupAdvancedParms TLSv1.2
+{
+  Envfile /etc/pagent.ttls.TLSv1.2.env
+}"
+
+	#MSF - fix this to not just append
+	echo "\${ttlsrule}" >>/etc/pagent.ttls.conf
 
 	ttlsresult=\`opercmd 'd tcpip,,netstat,config' 2>/dev/null | awk ' /TTLS:/ { print \$2; }'\`
 	pagentresult=\`opercmd 'd tcpip,,netstat,config' 2>/dev/null | awk ' /PROCNAME: PAGENT/ { print; }'\`
@@ -73,7 +105,7 @@ ENDAUTOLOG"
 		profhdr="; EQAE20 start ;"
 		profftr="; EQAE20 end ;"
 
-		registrar "EQAE20" "${verb}" "ZBREW.TCPIP" "PROFILE" "\$profhdr" "\$profftr" ";" ";" "\${text}"
+		registrar "EQAE20" "${verb}" "\${ZBREW_TGT_HLQ}TCPPARMS" "TCPPROF" "\$profhdr" "\$profftr" ";" ";" "\${text}"
 		rc=\$?
 		if [ \$rc -gt 0 ]; then
 			exit \$rc
@@ -106,15 +138,15 @@ if [ "${verb}" = "ENABLE" ]; then
 //SYSOUT DD SYSOUT=*
 //*"
 		procregistrar "EQAE20" "${verb}" "PAGENT" "\${pagenttask}"	
-		opercmd "START PAGENT"
+		opercmd "START PAGENT" >/dev/null 2>&1
 	fi
 	exit \$?
 EOF
 else
 	cat << EOF >>${script}
-	pagentdataset=\`procwhence PAGENT\` 2>&1
-	if [ "\$pagentdataset" = "\${ZBREW_TARGET}.PROCLIB" ]; then
-		opercmd "STOP PAGENT"
+	pagentdataset=\`procwhence PAGENT 2>&1\`
+	if [ "\$pagentdataset" = "\${ZBREW_TGT_HLQ}PROCLIB" ]; then
+		opercmd "STOP PAGENT" >/dev/null 2>&1
 		procregistrar "EQAE20" "${verb}" "PAGENT" "\${pagenttask}"	
 	fi
 	exit \$?

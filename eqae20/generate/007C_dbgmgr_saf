@@ -22,8 +22,8 @@ export PRODUCT_CODE="$PRODUCT_CODE"
 if ! \`supportsDebugManager "\$PRODUCT_CODE"\`; then
 	exit 0
 fi
-sp=\`securityProduct\`
-if [ "\${sp}" != "RACF" ]; then
+sp=\`secmgr\`
+if [ "\${sp}" != "RCVT" ]; then
 	echo "Security product support for \${sp} not implemented yet" >&2
 	exit 16
 fi
@@ -43,24 +43,17 @@ if [ "${verb}" = "DISABLE" ]; then
 	tsocmd "PERMIT BPX.SERVER CLASS(FACILITY) DELETE ID(STCDBM)" >/dev/null 2>/dev/null
 	tsocmd "RDELETE STARTED DBGMGR.*" >/dev/null 2>&1
 	tsocmd "DELUSER STCDBM" >/dev/null 2>&1
-	issueTSO "SETROPTS RACLIST(FACILITY) REFRESH"
-	chk "\$?" "Unable to refresh facility task class"
+	
+	racfRefreshClasses "FACILITY OPERCMDS SERVAUTH STARTED"
 	exit 0
 EOF
 
 else 
 	cat << EOF >>${script}
-	issueTSO "SETROPTS GENERIC(FACILITY)"
-	chk "\$?" "Unable to set generic(facility)"
+	racfSetGenericClasses "FACILITY STARTED SERVAUTH"
+	chk "\$?" "Unable to configure EQAE20"
 
-	issueTSO "SETROPTS CLASSACT(FACILITY) RACLIST(FACILITY)"
-	chk "\$?" "Unable to set classact(facility)"
-
-	issueTSO "SETROPTS GENERIC(STARTED)"
-	chk "\$?" "Unable to set generic(started)"
-
-	issueTSO "SETROPTS CLASSACT(STARTED) RACLIST(STARTED)"
-	chk "\$?" "Unable to activate STARTED class"
+	racfActivateAndShareClasses "FACILITY STARTED SERVAUTH"
 
 	if ! \`racfGroupExists STCGROUP\` ; then
 		issueTSO "RDEFINE STARTED ** STDATA(USER(=MEMBER) GROUP(STCGROUP) TRACE(YES))"
@@ -71,29 +64,80 @@ else
 	fi
 
 	tsocmd "DELUSER STCDBM" >/dev/null 2>&1
-
 	issueTSO "ADDUSER STCDBM DFLTGRP(STCGROUP) NOPASSWORD NAME('DEBUG MANAGER') OMVS(AUTOUID HOME(/tmp) PROGRAM(/bin/sh) ) DATA('IBM z/OS Debugger')"
 	chk "\$?" "Unable to create user STCDBM"
 
 	tsocmd "RDELETE STARTED DBGMGR.*" >/dev/null 2>&1
-
 	issueTSO "RDEFINE STARTED DBGMGR.* DATA('DEBUG MANAGER') STDATA(USER(STCDBM) GROUP(STCGROUP) TRUSTED(NO))"
 	chk "\$?" "Unable to define started task profile DBGMGR.*"
 
-	issueTSO "SETROPTS RACLIST(STARTED) REFRESH"
-	chk "\$?" "Unable to refresh started task class"
+	tsocmd "DELUSER PAGENT" >/dev/null 2>&1
+	issueTSO "ADDUSER PAGENT DFLTGRP(SYS1) OMVS(UID(0) SHARED HOME('/')) NAME('TCP/IP POLICY AGENT') NOPASSWORD"
+	chk "\$?" "Unable to create user PAGENT"
+
+	tsocmd "RDELETE STARTED PAGENT.*" >/dev/null 2>&1
+	issueTSO "RDEFINE STARTED PAGENT.* STDATA(USER(PAGENT) GROUP(SYS1)) DATA('TCP/IP POLICY AGENT')"
+	chk "\$?" "Unable to define started task profile PAGENT.*"
 
 	if ! \`racfProfileExists "FACILITY" "BPX.SERVER"\` ; then
 		issueTSO "RDEFINE FACILITY BPX.SERVER UACC(NONE)"
 		chk "\$?" "Unable to define profile BPX.SERVER"
 	fi
 
-	tsocmd "PERMIT BPX.SERVER CLASS(FACILITY) DELETE ID(STCDBM)" >/dev/null 2>/dev/null
-	issueTSO "PERMIT BPX.SERVER CLASS(FACILITY) ACCESS(UPDATE) ID(STCDBM)"
-	chk "\$?" "Unable to refresh started task class"
+	if ! \`racfProfileExists "OPERCMDS" "MVS.SERVMGR.PAGENT"\` ; then
+		issueTSO "RDEFINE OPERCMDS MVS.SERVMGR.PAGENT UACC(NONE) DATA('restrict startup of policy agent')"
+		chk "\$?" "Unable to define profile MVS.SERVMGR.PAGENT"
+	fi
 
-	issueTSO "SETROPTS RACLIST(FACILITY) REFRESH"
-	chk "\$?" "Unable to refresh facility task class"
+	racfPermitUsers "FACILITY" "BPX.SERVER" "UPDATE" "STCDBM"
+	chk "\$?" "Unable to configure EQAE20"
+
+	racfPermitUsers "OPERCMDS" "MVS.SERVMGR.PAGENT" "CONTROL" "PAGENT"
+	chk "\$?" "Unable to configure EQAE20"
+
+	if ! \`racfProfileExists "SERVAUTH" "EZB.INITSTACK.**"\` ; then
+		issueTSO "RDEFINE SERVAUTH EZB.INITSTACK.** UACC(NONE)"
+		chk "\$?" "Unable to define servauth profile EZB.INITSTACK.**"
+	fi
+
+	racfPermitUsers "SERVAUTH" "EZB.INITSTACK.**" "READ" "PAGENT" "OMPROUTE" "OSNMPD" "IOBSNMP" "NAMED"
+	chk "\$?" "Unable to configure EQAE20"
+
+	if ! \`racfProfileExists "SERVAUTH" "EZB.PAGENT.**"\` ; then
+		issueTSO "RDEFINE SERVAUTH EZB.PAGENT.** UACC(NONE) DATA('restrict access to pasearch command')"
+		racfPermitUsers "SERVAUTH" "EZB.PAGENT.**" "READ" "TCPADMIN"
+	fi
+
+	if ! \`racfProfileExists "FACILITY" "IRR.DIGTCERT.LIST"\` ; then
+		issueTSO "RDEFINE FACILITY IRR.DIGTCERT.LIST UACC(NONE)"
+		chk "\$?" "Unable to define profile IRR.DIGTCERT.LIST"
+	fi
+	if ! \`racfProfileExists "FACILITY" "IRR.DIGTCERT.LISTRING"\` ; then
+		issueTSO "RDEFINE FACILITY IRR.DIGTCERT.LISTRING UACC(NONE)"
+		chk "\$?" "Unable to define profile IRR.DIGTCERT.LISTRING"
+	fi
+
+	racfPermitUsers "FACILITY" "IRR.DIGTCERT.LIST" "READ" "STCDBM"
+	chk "\$?" "Unable to configure EQAE20"
+
+	racfPermitUsers "FACILITY" "IRR.DIGTCERT.LISTRING" "READ" "STCDBM"
+	chk "\$?" "Unable to configure EQAE20"
+
+	subjectsDN=\`racfSubjectsDN "Debug Manager"\`
+	issueTSO "RACDCERT ID(stcdbm) GENCERT \${subjectsDN} KEYUSAGE(HANDSHAKE) WITHLABEL('dbgmgr')"
+	chk "\$?" "Unable to configure EQAE20"
+
+	tsocmd "racdcert listring(dbgmgr.racf) id(stcdbm)" >/dev/null 2>&1
+	if [ \$? -gt 0 ]; then
+		issueTSO "RACDCERT ID(stcdbm) ADDRING(dbgmgr.racf)"
+		chk "\$?" "Unable to create dbgmgr.racf ring"
+	fi
+
+	issueTSO "RACDCERT ID(STCDBM) CONNECT(ID(STCDBM) LABEL('dbgmgr') RING(dbgmgr.racf) USAGE(PERSONAL) DEFAULT)"
+	chk "\$?" "Unable to create connect user certificate to ring"
+
+	racfRefreshClasses "FACILITY STARTED SERVAUTH OPERCMDS DIGTCERT"
+	chk "\$?" "Unable to configure EQAE20"
 
 	exit 0
 EOF

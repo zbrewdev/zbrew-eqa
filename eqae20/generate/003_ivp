@@ -11,26 +11,26 @@ zbrew=`whence zbrew`
 zbrewdir=${zbrew%/*} 
 zbrewroot=${zbrewdir%/*}
 
-if [ "${verb}" = "DISABLE" ]; then
-	cat << EOF >${script}
-#!/bin/sh
-# No code required to 'undo' IVP
-exit 0
-EOF
-	exit 0
-fi
-
-# ENABLE
-
 cat << EOF >${script}
-#!/bin/sh
-#set -x
-export PATH=${zbrewdir}:\$PATH
-. zbrewsetenv
-
-\${ZBREW_WORKROOT}/zbrew-eqa/eqae20/update/ivp
-exit $?
+	#!/bin/sh
+	#set -x
+	export PATH=${zbrewdir}:\$PATH
+	. zbrewsetenv
 EOF
+
+if [ "${verb}" = "DISABLE" ]; then
+	cat << EOF >>${script}
+	# No code required to 'undo' IVP
+	exit 0
+EOF
+
+else # ENABLE
+	cat << EOF >>${script}
+	\${ZBREW_WORKROOT}/zbrew-eqa/eqae20/update/ivp
+	exit \$?
+EOF
+
+fi
 
 if [ $? -gt 0 ]; then
 	echo "Unable to create EQAE20 Update script: ${script}." >&2
