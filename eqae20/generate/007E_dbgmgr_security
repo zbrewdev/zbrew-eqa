@@ -75,10 +75,6 @@ TTLSGroupAction grp_Production
   TTLSEnabled On
   TTLSGroupAdvancedParmsRef TLSv1.2
   Trace       3
-}
-TTLSGroupAdvancedParms TLSv1.2
-{
-  Envfile /etc/pagent.ttls.TLSv1.2.env
 }"
 
 	#MSF - fix this to not just append
@@ -106,10 +102,7 @@ ENDAUTOLOG"
 		profftr="; EQAE20 end ;"
 
 		registrar "EQAE20" "${verb}" "\${ZBREW_TGT_HLQ}TCPPARMS" "TCPPROF" "\$profhdr" "\$profftr" ";" ";" "\${text}"
-		rc=\$?
-		if [ \$rc -gt 0 ]; then
-			exit \$rc
-		fi
+		chk "\$?" "Unable to register \${ZBREW_TGT_HLQ}TCPPARMS(TCPPROF)"
 	fi
 EOF
 
@@ -123,7 +116,7 @@ chmod u+x "${script}"
 if [ "${verb}" = "ENABLE" ]; then
 	cat << EOF >>${script}
 	procwhence PAGENT >/dev/null 2>&1
-	if [ $? -gt 0 ]; then
+	if [ \$? -gt 0 ]; then
 		pagenttask="//PAGENT PROC PRM='-L SYSLOGD' * '' or '-L SYSLOGD'
 //*
 //* TCP/IP POLICY AGENT
@@ -138,7 +131,9 @@ if [ "${verb}" = "ENABLE" ]; then
 //SYSOUT DD SYSOUT=*
 //*"
 		procregistrar "EQAE20" "${verb}" "PAGENT" "\${pagenttask}"	
+		chk "\$?" "Unable to register proc PAGENT"
 		opercmd "START PAGENT" >/dev/null 2>&1
+		chk "\$?" "Unable to start PAGENT started task"
 	fi
 	exit \$?
 EOF
@@ -147,7 +142,9 @@ else
 	pagentdataset=\`procwhence PAGENT 2>&1\`
 	if [ "\$pagentdataset" = "\${ZBREW_TGT_HLQ}PROCLIB" ]; then
 		opercmd "STOP PAGENT" >/dev/null 2>&1
+		chk "\$?" "Unable to stop PAGENT started task"
 		procregistrar "EQAE20" "${verb}" "PAGENT" "\${pagenttask}"	
+		chk "\$?" "Unable to unregister proc PAGENT"
 	fi
 	exit \$?
 EOF

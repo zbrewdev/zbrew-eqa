@@ -1,0 +1,63 @@
+#!/bin/sh
+#set -x
+
+if ! [ $# -eq 2 ]; then
+	echo "Syntax: cics_saf ENABLE|DISABLE <output-script>" >&2
+	exit 8
+fi
+verb="$1"
+script="$2"
+
+zbrew=`whence zbrew`
+zbrewdir=${zbrew%/*}
+zbrewroot=${zbrewdir%/*}
+
+cat << EOF >${script}
+#!/bin/sh
+export PATH=${zbrewdir}:\$PATH
+. zbrewsetswenv eqae20
+. \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
+export PRODUCT_CODE="$PRODUCT_CODE"
+
+if ! \`supportsCICS \`; then
+	exit 0
+fi
+sp=\`secmgr\`
+if [ "\${sp}" != "RCVT" ]; then
+	echo "Security product support for \${sp} not implemented yet" >&2
+	exit 16
+fi
+
+EOF
+
+if [ $? -gt 0 ]; then
+	echo "Unable to create EQAE20 Update script: ${script}." >&2
+	exit 16
+fi
+
+chmod u+x "${script}"
+
+if [ "${verb}" = "DISABLE" ]; then
+	cat << EOF >>${script}
+        exit 0
+EOF
+
+else
+	cat << EOF >>${script} 
+	if [ "\$ZBREW_DFH_SET_MINIMAL_SECURITY" = "YES" ]; then
+		tsocmd "DELUSER CICSUSER" >/dev/null 2>&1
+		issueTSO "ADDUSER CICSUSER NAME('CICSUSER') NOPASSWORD OWNER(SYS1) DFLTGRP(SYS1)"
+		chk "\$?" "Unable to add user CICSUSER"
+
+		tsocmd "RDELETE STARTED \${ZBREW_DFH_PROC}.*" >/dev/null 2>&1
+		issueTSO "RDEFINE STARTED \${ZBREW_DFH_PROC}.* STDATA(USER(CICSUSER) GROUP(SYS1))"
+		chk "\$?" "Unable to define resource \${ZBREW_DFH_PROC}.*"
+		issueTSO "SETROPTS RACLIST(STARTED) REFRESH"
+		chk "\$?" "Unable to refresh RACLIST(STARTED)"
+	fi
+	exit 0
+EOF
+
+fi
+
+exit 0

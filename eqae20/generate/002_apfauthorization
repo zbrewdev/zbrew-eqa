@@ -25,7 +25,7 @@ if \`supportsMFI "\$PRODUCT_CODE"\`; then
 fi
 
 apfregistrar eqae20 "${verb}" "\${datasets}"
-exit $?
+exit \$?
 EOF
 
 if [ $? -gt 0 ]; then
