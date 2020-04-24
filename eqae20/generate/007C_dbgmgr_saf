@@ -54,6 +54,7 @@ else
 	chk "\$?" "Unable to configure EQAE20"
 
 	racfActivateAndShareClasses "FACILITY STARTED SERVAUTH"
+	chk "\$?" "Unable to configure EQAE20"
 
 	if ! \`racfGroupExists STCGROUP\` ; then
 		issueTSO "RDEFINE STARTED ** STDATA(USER(=MEMBER) GROUP(STCGROUP) TRACE(YES))"
@@ -106,6 +107,7 @@ else
 	if ! \`racfProfileExists "SERVAUTH" "EZB.PAGENT.**"\` ; then
 		issueTSO "RDEFINE SERVAUTH EZB.PAGENT.** UACC(NONE) DATA('restrict access to pasearch command')"
 		racfPermitUsers "SERVAUTH" "EZB.PAGENT.**" "READ" "TCPADMIN"
+		chk "\$?" "Unable to configure EQAE20"
 	fi
 
 	if ! \`racfProfileExists "FACILITY" "IRR.DIGTCERT.LIST"\` ; then

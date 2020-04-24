@@ -23,8 +23,7 @@ if  \`supportsMFI "\$PRODUCT_CODE"\`; then
 	datasets="\${datasets} \${ZBREW_TGT_HLQ}EQAE20.SEQABMOD"
 fi
 llregistrar eqae20 ${verb} "\${datasets}"
-
-exit $?
+exit \$?
 EOF
 
 if [ $? -gt 0 ]; then

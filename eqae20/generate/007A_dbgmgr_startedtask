@@ -19,23 +19,23 @@ export PATH=${zbrewdir}:\$PATH
 . \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
 export PRODUCT_CODE="$PRODUCT_CODE"
 if \`undefinedProperty "\${EQAE20_TZ_OVERRIDE}"\` ; then
-     if [ -z "\$TZ" ]; then
-          echo "dbgmgr: One of TZ or EQAE20_TZ_OVERRIDE must be specified" >&2
-          exit 4
-     else
-                 debug_tz="\${TZ}"
-     fi
+	if [ -z "\$TZ" ]; then
+		echo "dbgmgr: One of TZ or EQAE20_TZ_OVERRIDE must be specified" >&2
+		exit 4
+	else
+		debug_tz="\${TZ}"
+	fi
 else
-         debug_tz="\${EQAE20_TZ_OVERRIDE}"
+	debug_tz="\${EQAE20_TZ_OVERRIDE}"
 fi
 
 if \`undefinedProperty "\${EQAE20_DBGMGR_CLIENT}"\` ; then
-     echo "dbgmgr: EQAE20_DBGMGR_CLIENT must be specified" >&2
-     exit 4
+	echo "dbgmgr: EQAE20_DBGMGR_CLIENT must be specified" >&2
+	exit 4
 fi
 if \`undefinedProperty "\${EQAE20_DBGMGR_HOST}"\` ; then
-     echo "dbgmgr: EQAE20_DBGMGR_HOST must be specified" >&2
-     exit 4
+	echo "dbgmgr: EQAE20_DBGMGR_HOST must be specified" >&2
+	exit 4
 fi
 
 startedTask="//*
