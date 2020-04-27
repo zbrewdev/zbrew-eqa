@@ -26,7 +26,7 @@ EOF
 
 else # ENABLE
 	cat << EOF >>${script}
-	\${ZBREW_WORKROOT}/zbrew-eqa/eqae20/update/ivp
+	\${ZBREW_REPOROOT}/zbrew-eqa/eqae20/update/ivp
 	exit \$?
 EOF
 

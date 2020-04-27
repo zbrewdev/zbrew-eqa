@@ -336,7 +336,7 @@ zz
 #set -x
 createdatasets
 
-srcroot="${ZBREW_WORKROOT}/zbrew-eqa/eqae20/update/src/"
+srcroot="${ZBREW_REPOROOT}/zbrew-eqa/eqae20/update/src/"
 
 zbrewswinstalled asm
 if [ $? -gt 0 ]; then
