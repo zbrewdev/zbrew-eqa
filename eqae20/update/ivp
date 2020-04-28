@@ -65,19 +65,33 @@ createdatasets() {
 	datasets="${src} ${list} ${fblist} ${pmap} ${adata} ${obj} ${langx} ${cdbg} ${mod} ${lib} ${insplog} ${sysprint} ${sysout} ${dbgcmd}"
 
 	dtouch -tpdse ${src}
+	chk "$?" "Unable to allocate ${src}"
 	dtouch -tseq -l1562 -rvb -s5m ${langx}
+	chk "$?" "Unable to allocate ${langx}"
 	dtouch -tpdse ${obj}
+	chk "$?" "Unable to allocate ${obj}"
 	dtouch -tpdse ${cdbg}
+	chk "$?" "Unable to allocate ${cdbg}"
 	dtouch -tpds -ru ${mod}
+	chk "$?" "Unable to allocate ${mod}"
 	dtouch -tpdse -ru ${lib}
+	chk "$?" "Unable to allocate ${lib}"
 	dtouch -tpdse -rvb -l32756 ${adata}
+	chk "$?" "Unable to allocate ${adata}"
 	dtouch -tpdse -rvba -l137 ${list}
+	chk "$?" "Unable to allocate ${list}"
 	dtouch -tpdse -rvba -l137 ${pmap}
+	chk "$?" "Unable to allocate ${pmap}"
 	dtouch -tpdse -rfb -l133 ${fblist}
+	chk "$?" "Unable to allocate ${fblist}"
 	dtouch -tpdse -rfb -l72 ${insplog}
+	chk "$?" "Unable to allocate ${insplog}"
 	dtouch -tpdse -rvb -l137 ${sysprint}
+	chk "$?" "Unable to allocate ${sysprint}"
 	dtouch -tpdse ${sysout}
+	chk "$?" "Unable to allocate ${sysout}"
 	dtouch -tpdse ${dbgcmd}
+	chk "$?" "Unable to allocate ${dbgcmd}"
 }
 
 deletedatasets() {
@@ -317,8 +331,8 @@ zz
 		cleanup "IVP: Copy of assembler debug command file failed with rc: $rc. Command file retained" "${dbgcmd}" "${pgm}"
 	fi
 	steplib="${mod}:${ZBREW_TGT_HLQ}EQAE20.SEQAMOD:${ZBREW_CEEHLQ}.SCEERUN"
-	runargs="TEST(ERROR,INSPIN,,*)/"
-	mvscmd --pgm=DTIVPA --args="${runargs}" --steplib="${steplib}" --eqalangx="${langx}" --insplog="${insplog}(${pgm})" --inspin="${dbgcmd}(${pgm})" --sysout="${sysout}(${pgm}G)" 2>/dev/null 
+	runargs='TEST(ERROR,INSPIN,,*)/'
+	mvscmd --pgm=DTIVPA --args="${runargs}" --steplib="${steplib}" --eqalangx="${langx}" --insplog="${insplog}(${pgm})" --inspin="${dbgcmd}(${pgm})" --sysout="${sysout}(${pgm}G)" 
 
 	rc=$?
 	# MSF - for now treat things as 'ok' if it's an RC 8 because mvscmd is complaining when it can not free the (already freed?) ddname EQALANGX
@@ -333,7 +347,6 @@ zz
 # 
 # Run IVP for assembler, COBOL, PL/I and C
 #
-#set -x
 createdatasets
 
 srcroot="${ZBREW_REPOROOT}/zbrew-eqa/eqae20/update/src/"

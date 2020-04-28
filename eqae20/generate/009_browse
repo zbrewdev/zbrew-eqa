@@ -51,7 +51,7 @@ else
 	chk "\$?" "Unable to configure EQAE20"
 	racfPermitUsers "FACILITY" "EQADTOOL.BROWSE.MVS" "READ" "\${EQAE20_BROWSE_MVS_USERS_READ}"
 	chk "\$?" "Unable to configure EQAE20"
-	racfPermitUsers "FACILITY" "EQADTOOL.BROWSE.MVS" "UPDDATE" "\${EQAE20_BROWSE_MVS_USERS_UPDATE}"
+	racfPermitUsers "FACILITY" "EQADTOOL.BROWSE.MVS" "UPDATE" "\${EQAE20_BROWSE_MVS_USERS_UPDATE}"
 	chk "\$?" "Unable to configure EQAE20"
 	racfPermitUsers "FACILITY" "EQADTOOL.BROWSE.CICS" "NONE" "\${EQAE20_BROWSE_CICS_USERS_NONE}"
 	chk "\$?" "Unable to configure EQAE20"
