@@ -43,6 +43,7 @@ else
 	cat << EOF >>${script}
 	#
 	# Stop CICS started task
+	# Copy the CICS CCSD to a ZBREW CCSD
 	# Register the Debug CCSD 
 	# Add the debugger modules to the DFHRPL concatenation
 	# Update the CICS SYSIN to include the CICS grouplist 
@@ -54,6 +55,13 @@ else
 	#
 	stopCICS "\${ZBREW_DFH_PROC}"
 	chk "\$?" "Unable to stop CICS region \${ZBREW_DFH_PROC}"
+
+	#
+	# Copy the CICS CCSD to ZBREW CCSD
+	#
+	if ! \`vsamexists \${ZBREW_TGT_HLQ}CICS.DFHCSD \` ; then
+		vsamcp \${ZBREW_DFHHLQ}.CICS.DFHCSD \${ZBREW_TGT_HLQ}CICS.DFHCSD 
+	fi
 
 	#
 	# remove the ADD GROUP line at the end of the CCSD sample, but keep everything else and register the Debug CCSD
@@ -103,6 +111,9 @@ else
 
 	jcl=\`jclAddDatasetToDD "\${jcl}" "\${step}" "DFHRPL" "\${ZBREW_TGT_HLQ}EQAE20.SEQAMOD"\`
 	chk "\$?" "Unable to add \${ZBREW_TGT_HLQ}EQAE20.SEQAMOD to CICS started task \${ZBREW_DFH_PROCLIB}(\${ZBREW_DFH_PROC})"
+
+	jcl=\`jclReplaceDD "\${jcl}" "\${step}" "DFHCSD" "\${ZBREW_TGT_HLQ}CICS.DFHCSD"\`
+	chk "\$?" "Unable to change CICS SYSIN for \${ZBREW_DFH_PROC} to \${ZBREW_TGT_HLQ}SYSIN(\${ZBREW_DFH_SYSIN_TRAN})"
 
 	jcl=\`jclReplaceDD "\${jcl}" "\${step}" "SYSIN" "\${ZBREW_TGT_HLQ}SYSIN(\${ZBREW_DFH_SYSIN_TRAN_JCL})"\`
 	chk "\$?" "Unable to change CICS SYSIN for \${ZBREW_DFH_PROC} to \${ZBREW_TGT_HLQ}SYSIN(\${ZBREW_DFH_SYSIN_TRAN})"
