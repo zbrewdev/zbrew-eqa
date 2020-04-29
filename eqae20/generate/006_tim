@@ -15,7 +15,7 @@ cat << EOF >${script}
 #!/bin/sh
 export PATH=${zbrewdir}:\$PATH
 . zbrewsetswenv eqae20
-. $ZBREW_WORKROOT/zbrew-eqa/eqafuncs
+. $ZBREW_REPOROOT/zbrew-eqa/eqafuncs
 export PRODUCT_CODE="$PRODUCT_CODE"
 
 if \`supportsMFI "\$PRODUCT_CODE"\`; then

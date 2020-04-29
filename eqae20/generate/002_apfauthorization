@@ -17,7 +17,7 @@ cat << EOF >${script}
 export PATH=${zbrewdir}:\$PATH
 export PRODUCT_CODE="${PRODUCT_CODE}"
 . zbrewsetenv
-. \$ZBREW_WORKROOT/zbrew-eqa/eqafuncs
+. \$ZBREW_REPOROOT/zbrew-eqa/eqafuncs
 
 datasets="\${ZBREW_TGT_HLQ}EQAE20.SEQAAUTH"
 if \`supportsMFI "\$PRODUCT_CODE"\`; then
