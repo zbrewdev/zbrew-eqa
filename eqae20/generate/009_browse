@@ -47,6 +47,12 @@ else
 	racfSetGenericClasses "FACILITY"
 	chk "\$?" "Unable to configure EQAE20"
 
+	if ! \`racfProfileExists "FACILITY" "EQADTOOL.BROWSE.MVS"\` ; then
+                issueTSO "RDEFINE FACILITY EQADTOOL.BROWSE.MVS UACC(NONE)"
+	fi
+	if ! \`racfProfileExists "FACILITY" "EQADTOOL.BROWSE.CICS"\` ; then
+                issueTSO "RDEFINE FACILITY EQADTOOL.BROWSE.CICS UACC(NONE)"
+	fi
 	racfPermitUsers "FACILITY" "EQADTOOL.BROWSE.MVS" "NONE" "\${EQAE20_BROWSE_MVS_USERS_NONE}"
 	chk "\$?" "Unable to configure EQAE20"
 	racfPermitUsers "FACILITY" "EQADTOOL.BROWSE.MVS" "READ" "\${EQAE20_BROWSE_MVS_USERS_READ}"
