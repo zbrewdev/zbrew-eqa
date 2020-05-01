@@ -22,7 +22,7 @@
 /* var1 = 0                                                           */
  DESCRIBE ATTRIBUTES var1 ;
 /*   ATTRIBUTES for var1                                              */
-/*     Its address is  205B7F00 and its length is 4                   */
+^.*Its address is .* and its length is 4.*$
 /*     signed int                                                     */
  int X ;
  X = var1 ;
