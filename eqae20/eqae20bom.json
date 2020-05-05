@@ -1,6 +1,6 @@
 {
 	"software": [{
-		"name":"EQAE20",
+		"relid":"EQAE20",
 		"datasets":[
                         {
                                 "dsname":"${ZBREW_CEEHLQ}.SCEELKED",
