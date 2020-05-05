@@ -1,7 +1,7 @@
 {
  	"software": [{
 		"relid":"EQAE20",
-		"config":{
+		"props":{
 			"EQAE20_AUTHDEBUG_USERS":"IBMUSER",
 			"EQAE20_TZ_OVERRIDE":"NONE",
 			"EQAE20_DBGMGR_CLIENT":"5335",
