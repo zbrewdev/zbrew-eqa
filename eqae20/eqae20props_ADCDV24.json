@@ -1,6 +1,6 @@
 {
  	"software": [{
-		"name":"EQAE20",
+		"relid":"EQAE20",
 		"config":{
 			"EQAE20_AUTHDEBUG_USERS":"IBMUSER",
 			"EQAE20_TZ_OVERRIDE":"NONE",
