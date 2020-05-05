@@ -1,9 +1,0 @@
-LICENSE
-README.md
-eqafuncs
-eqae20/*.json
-eqae20/eqae20config
-eqae20/eqae20deconfig
-eqae20/generate/*
-eqae20/update/ivp
-eqae20/update/src/*
